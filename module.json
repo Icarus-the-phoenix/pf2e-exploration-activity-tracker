@@ -1,0 +1,30 @@
+{
+  "id": "pf2e-exploration-activity-tracker",
+  "title": "Pf2e Exploration Activity Tracker",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "styles":[
+    "styles/pf2e-exploration-activity-tracker.css"
+  ],
+  "languages":[
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    }
+  ],
+  "description": "This module will create a window to easly see what exploration activities your PCs are doing as well as any rolls associated with their activity. In addition the window will allow you to apply exploration effects (like Defend's Raise a Shield, Follow the Expert, and Scout) at the press of a button.",
+  "authors": [
+    {
+      "name": "Icarus",
+      "discord": "scream_engineer",
+      "flags": {}
+    }
+  ]
+}

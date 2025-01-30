@@ -1,0 +1,43 @@
+.exploration-button {
+    background: transparent;
+    padding: 6px 4px 2px 4px;
+    font-size: 1.25em;
+    line-height: normal;
+    color: var(--color-text-light-highlight);
+    border: 0;
+    border-top: 2px groove var(--color-border-dark-secondary);
+    text-align: left;
+}
+
+.exploration-button:hover, .exploration-button:focus {
+    box-shadow: none;
+    text-shadow: 0 0 5px red;
+}
+
+.exploration-button > i {
+    margin: 0px 6px 0px 6px;
+    padding-left: 4px;
+}
+
+.application .exploration-table {
+    margin: 0.5em 0;
+    border-top: 1px solid var(--color-border-highlight);
+    border-radius: 0px;
+}
+
+.exploration-table tr {
+    border-bottom: 1px solid var(--color-border-light-tertiary);
+}
+
+.exploration-table tr:last-child {
+    border-bottom: 1px solid var(--color-border-highlight);
+}
+
+.exploration-table .content-link {
+    color: var(--color-text-dark-primary);
+    background: #DDD;
+}
+
+.exploration-table .tags .tag.tag_transparent{
+    background-color: var(--blind-roll);
+}

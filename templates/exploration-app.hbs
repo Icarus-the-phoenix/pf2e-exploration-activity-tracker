@@ -1,0 +1,54 @@
+<div>
+    <table class="exploration-table">
+        <tr>
+            <th>Activity</th>
+            <th>Name</th>
+            <th>Misc</th>
+        </tr>
+
+        {{! Create HTML for each activity, each player using them, and misc data like roll results and buttons}}
+        {{#each activities}}
+        <tr>
+            
+            {{! Create HTML for activity column and make is span a number of rows to match how many players are using it}}
+            <th rowspan="{{eat-obj-length players}}">
+                {{{enrichedHTML}}}
+            </th>
+
+            {{! Create HTML for player's name and misc table columns}}
+            {{#each players}}
+                {{! Player's name with color of user}}
+                <th style="text-align: left;"><strong style="color: {{color}};">{{name}}</strong></th>
+                
+                {{! If a roll property exists create HTML for the roll}}
+                {{#if roll}}
+                    <th>
+                        {{! Add Roll result}}
+                        {{{roll.resultHTML}}}
+
+                        <i class="fa-solid fa-rotate rotate"></i>
+
+                        {{! Add modifier boxes }}
+                        <div class="tags modifiers" style="justify-content:center;">
+                        {{#each roll.modifiers}}
+                        {{#if enabled}}
+                            <span class="tag tag_transparent" data-slug="{{slug}}">{{label}} {{isPositive modifier}}{{modifier}}</span>
+                        {{/if}}
+                        {{/each}}
+                        </div>
+                    </th>
+
+                {{! If a button property exists creat HTML for Button}}
+                {{else if button}}
+                    <th><button data-action="{{button.dataAction}}">{{button.label}}</button></th>
+
+                {{! If neither button or roll exist display a user tip or leave blank}}
+                {{else}}
+                    <td>tip</td>
+                {{/if}}
+                </tr>
+            {{/each}}
+        </tr>
+        {{/each}}
+    </table>
+</div>
