@@ -1,5 +1,5 @@
 import { PF2eEATConstants } from "./constants.mjs";
-import { getExplorationData } from "./utils.mjs";
+import { getExplorationData, applyEffect } from "./utils.mjs";
 
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -15,6 +15,7 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
             width: 600
         },
         actions: {
+            applyRaiseAShield: this.prototype.applyRaiseAShield,
             applyEffect: this.prototype.applyEffect,
             removeEffect: this.prototype.removeEffect,
             reroll: this.prototype.reroll,
@@ -51,5 +52,9 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
                 { type: "reset", action: "reset", icon: "fa-solid fa-undo", label: "SETTINGS.Reset" },
             ]
         }
+    }
+
+    applyRaiseAShield(evt, target) {
+        applyEffect(target.getAttribute("actorId"), "Compendium.pf2e.equipment-effects.Item.2YgXoHvJfrDHucMr");
     }
 }

@@ -47,11 +47,11 @@ async function getExplorationData(){
                     activities[activity.name].players[partyMember.name].roll = result;
                 break;
                 case DEFEND_ID:
-                    // TODO: Continue implementing Defend.
-                    //       IDEA is to have defend hook onto combat creation and apply effect with duration lasting until player's turn
+                    // TODO: IDEA is to have defend hook onto combat creation and apply effect with duration lasting until player's turn
                     activities[activity.name].players[partyMember.name].button = {
                         label: game.i18n.localize("PF2e-EAT.apply-effect-button"),
-                        dataAction: "defend"
+                        actorId: partyMember.id,
+                        dataAction: "applyRaiseAShield"
                     }
                 break;
                 case FOLLOE_THE_EXPERT_ID:
@@ -129,9 +129,10 @@ async function getRollResult(actor, skill, actionSlug){
     };
 }
 
-async function applyEffect(actors, effectUUID, effectModifications) {
+export async function applyEffect(actorIds, effectUUID, effectModifications) {
     const item = await fromUuid(effectUUID);
-    if(!Array.isArray(actors)) actors = [actors];
+    if(!Array.isArray(actorIds)) actorIds = [actorIds];
+    const actors = actorIds.map((a) => game.actors.get(a));
     if (item?.type === "effect") {
         const source = item.toObject();
         source._stats.compendiumSource = effectUUID;
