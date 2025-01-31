@@ -129,10 +129,9 @@ async function getRollResult(actor, skill, actionSlug){
     };
 }
 
-export async function applyEffect(actorIds, effectUUID, effectModifications) {
+export async function applyEffect(actors, effectUUID, effectModifications) {
     const item = await fromUuid(effectUUID);
-    if(!Array.isArray(actorIds)) actorIds = [actorIds];
-    const actors = actorIds.map((a) => game.actors.get(a));
+    if(!Array.isArray(actors)) actors = [actors];
     if (item?.type === "effect") {
         const source = item.toObject();
         source._stats.compendiumSource = effectUUID;
@@ -142,7 +141,7 @@ export async function applyEffect(actorIds, effectUUID, effectModifications) {
             if (!existing) {
                 const effect = await actor.createEmbeddedDocuments("Item", [source]);
                 console.log(effect);
-                mergeObject(effect, effectModifications);
+                foundry.utils.mergeObject(effect, effectModifications);
             } 
             else if (effectUUID !== "Compendium.pf2e.other-effects.Item.EMqGwUi3VMhCjTlF"){
                 ui.notifications.info(`${actor.name} already has that effect.`)

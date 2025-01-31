@@ -55,6 +55,6 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     applyRaiseAShield(evt, target) {
-        applyEffect(target.getAttribute("actorId"), "Compendium.pf2e.equipment-effects.Item.2YgXoHvJfrDHucMr");
+        applyEffect(game.actors.get(target.getAttribute("actorId")), "Compendium.pf2e.equipment-effects.Item.2YgXoHvJfrDHucMr");
     }
 }
