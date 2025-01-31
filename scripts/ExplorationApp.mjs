@@ -22,13 +22,19 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         }
     }, {inplace: false});
 
+    constructor(options ={}){
+        super(options);
+        this.activities = { };
+    }
+
     static PARTS = {
         body: { template: PF2eEATConstants.TEMPLATES.EXPLORATIONAPP },
         footer: { template: `templates/generic/form-footer.hbs` }
     }
 
-    async _prepareContext(partId, context) {
-        const activities = await getExplorationData();
+    async _prepareContext(partId, context) {     
+        this.activities = await getExplorationData();
+        const activities = this.activities;
 
         return {
             activities,

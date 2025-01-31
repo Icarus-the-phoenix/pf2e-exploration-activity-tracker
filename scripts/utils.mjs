@@ -1,9 +1,9 @@
-const avoidNoticeID = "Compendium.pf2e.actionspf2e.Item.IE2nThCmoyhQA0Jn";
-const defendID = "Compendium.pf2e.actionspf2e.Item.cYtYKa1gDEl7y2N0";
-const followTheExpertID = "Compendium.pf2e.actionspf2e.Item.tfa4Sh7wcxCEqL29";
-const investigateID = "Compendium.pf2e.actionspf2e.Item.EwgTZBWsc8qKaViP";
-const scoutID = "Compendium.pf2e.actionspf2e.Item.kV3XM0YJeS2KCSOb";
-const searchID = "Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU";
+const AVOID_NOTICE_ID = "Compendium.pf2e.actionspf2e.Item.IE2nThCmoyhQA0Jn";
+const DEFEND_ID = "Compendium.pf2e.actionspf2e.Item.cYtYKa1gDEl7y2N0";
+const FOLLOE_THE_EXPERT_ID = "Compendium.pf2e.actionspf2e.Item.tfa4Sh7wcxCEqL29";
+const INVESTIGATE_ID = "Compendium.pf2e.actionspf2e.Item.EwgTZBWsc8qKaViP";
+const SCOUT_ID = "Compendium.pf2e.actionspf2e.Item.kV3XM0YJeS2KCSOb";
+const SEARCH_ID = "Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU";
 
 // TODO: Create Refresh Data and rerender when data is refreshed
 async function getExplorationData(){
@@ -41,12 +41,12 @@ async function getExplorationData(){
             // Add data to activities object based on if requires Roll, Buttons, or tips
             let skill, result;
             switch(activity.sourceId){
-                case avoidNoticeID:
+                case AVOID_NOTICE_ID:
                     skill = partyMember.skills.stealth;
                     result = await getRollResult(partyMember, skill, "avoid-notice");
                     activities[activity.name].players[partyMember.name].roll = result;
                 break;
-                case defendID:
+                case DEFEND_ID:
                     // TODO: Continue implementing Defend.
                     //       IDEA is to have defend hook onto combat creation and apply effect with duration lasting until player's turn
                     activities[activity.name].players[partyMember.name].button = {
@@ -54,16 +54,16 @@ async function getExplorationData(){
                         dataAction: "defend"
                     }
                 break;
-                case followTheExpertID:
+                case FOLLOE_THE_EXPERT_ID:
 
                 break;
-                case investigateID:
+                case INVESTIGATE_ID:
 
                 break;
-                case scoutID:
+                case SCOUT_ID:
 
                 break;
-                case searchID:
+                case SEARCH_ID:
                     skill = partyMember.perception;
                     result = await getRollResult(partyMember, skill, "search");
                     activities[activity.name].players[partyMember.name].roll = result;                  

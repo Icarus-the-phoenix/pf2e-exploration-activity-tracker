@@ -1,6 +1,0 @@
-
-class ExplorationData {
-    static getAllExplorationData(){
-        
-    }
-}
