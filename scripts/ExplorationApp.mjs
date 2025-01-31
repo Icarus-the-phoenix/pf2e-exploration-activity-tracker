@@ -19,12 +19,20 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
             removeEffect: this.prototype.removeEffect,
             reroll: this.prototype.reroll,
             recallKnowledgeMacro: this.prototype.recallKnowledgeMacro
-        }
+        },
+        id: "explortion-activity-tracker-app"
     }, {inplace: false});
 
     constructor(options ={}){
         super(options);
-        this.activities = { };
+        const existing = foundry.applications.instances.get(this.constructor.DEFAULT_OPTIONS.id);
+        if(existing){
+            existing.activities = { };
+            return existing;
+        }
+        else{
+            this.activities = { };
+        }
     }
 
     static PARTS = {
