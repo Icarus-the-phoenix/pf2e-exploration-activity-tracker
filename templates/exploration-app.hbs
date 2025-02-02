@@ -23,8 +23,8 @@
                 {{! If a roll property exists create HTML for the roll}}
                 {{#if roll}}
                     <th>
-                        {{! Add Roll result}}
-                        {{{roll.resultHTML}}}
+                        {{! Add Roll result}} 
+                        <span style="{{roll.rollData.color}}" data-tooltip="{{roll.rollData.result}}">{{roll.rollData.total}}</span>
 
                         <i class="fa-solid fa-rotate rotate"></i>
 

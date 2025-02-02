@@ -134,7 +134,11 @@ async function getRollResult(actor, skill, actionSlug, subordinateActionSlug){
     const enabledModifiers = getEnabledRollModifiers(checkModifiers);
     const potentialModifiers = getPotentialRollModifiers(checkModifiers);
     return {
-        resultHTML : `<span style="${color}" data-tooltip="${rollData.result}">${rollData.total}</span>`,
+        rollData: {
+            total: rollData.total,
+            result: rollData.result,
+            color: color
+        },
         enabledModifiers : enabledModifiers,
         potentialModifiers : potentialModifiers,
     };
@@ -152,9 +156,9 @@ function getPotentialRollModifiers(checkModifiers){
     console.log(checkModifiers);
     // TODO: change this to check for predicates on subordinate actions instead of Rolloptions that are toggleable
     const potentialModifiers = checkModifiers.modifiers.filter((m) =>
-        m.rule?.parent.rules.filter(r => 
-            r.key === "RollOption"
-        ).find(r => r.toggleable === true)
+        m.rule?.parent.rules.filter(r =>    // Get parent of modifier with a rule element
+            r.key === "RollOption"          // Check if any of the parents children is a RollOption Rule Element
+        ).find(r => r.toggleable === true)  // Find if toggleable is true
     );
 
     return potentialModifiers;
