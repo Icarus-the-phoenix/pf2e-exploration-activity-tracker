@@ -33,6 +33,10 @@
     border-bottom: 1px solid var(--color-border-highlight);
 }
 
+.exploration-table hr {
+    margin: 0.25rem 0;
+}
+
 .exploration-table .content-link {
     color: var(--color-text-dark-primary);
     background: #DDD;

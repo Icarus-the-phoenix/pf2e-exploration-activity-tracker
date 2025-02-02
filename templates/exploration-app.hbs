@@ -28,12 +28,22 @@
 
                         <i class="fa-solid fa-rotate rotate"></i>
 
-                        {{! Add modifier boxes }}
+                        {{! Add modifier boxes for enabled modifiers }}
                         <div class="tags modifiers" style="justify-content:center;">
-                        {{#each roll.modifiers}}
-                        {{#if enabled}}
+                        {{#each roll.enabledModifiers}}
                             <span class="tag tag_transparent" data-slug="{{slug}}">{{label}} {{isPositive modifier}}{{modifier}}</span>
+                        {{/each}}
+                        </div>
+
+                        {{#if roll.potentialModifiers}}
+                        <hr>
+                        <span>Potential Modifiers</span>
                         {{/if}}
+
+                        {{! Add modifier boxes for potential modifiers}}
+                        <div class="tags modifiers" style="justify-content:center;">
+                        {{#each roll.potentialModifiers}}
+                            <span class="tag tag_transparent" data-slug="{{slug}}" data-tooltip="{{{rule.parent.description}}}">?? {{label}} {{isPositive modifier}}{{modifier}}</span>
                         {{/each}}
                         </div>
                     </th>

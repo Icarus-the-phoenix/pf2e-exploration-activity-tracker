@@ -68,7 +68,7 @@ async function getExplorationData(){
                 break;
                 case SEARCH_ID:
                     skill = partyMember.perception;
-                    result = await getRollResult(partyMember, skill, "search");
+                    result = await getRollResult(partyMember, skill, "search", "seek");
                     activities[activity.name].players[partyMember.name].roll = result;                  
                 break;
             }
@@ -109,31 +109,55 @@ function getRollColor(dieRoll){
     return color;
 }
 
-async function getRollResult(actor, skill, actionSlug){
+async function getRollResult(actor, skill, actionSlug, subordinateActionSlug){
     const domains = ['all', 'check', 'skill-check', `${skill.slug}`, `${skill.slug}-check`, `${skill.attribute}-based`, `${skill.attribute}-skill-check`]
     const options = actor.getRollOptions(domains);
     options.push(
         `action:${actionSlug}`,
-        "secret"
+        "secret",
+        `action:${subordinateActionSlug}`
     );
-    const modifiers = new game.pf2e.CheckModifier(`Avoid Notice (${skill.label})`, skill);
+    const checkModifiers = new game.pf2e.CheckModifier(`${actionSlug} (${skill.label})`, skill);
     const rollData = await game.pf2e.Check.roll(
-        modifiers, 
+        checkModifiers, 
         {
             actor: actor,
             type: `skill-check`,
             traits: ['exploration'],
             options,
             domains,
-            createMessage: false,
+            createMessage: true,
             skipDialog: true
         }
     );
     const color = getRollColor(rollData.dice[0]);
+    const enabledModifiers = getEnabledRollModifiers(checkModifiers);
+    const potentialModifiers = getPotentialRollModifiers(checkModifiers);
     return {
         resultHTML : `<span style="${color}" data-tooltip="${rollData.result}">${rollData.total}</span>`,
-        modifiers : modifiers.modifiers
+        enabledModifiers : enabledModifiers,
+        potentialModifiers : potentialModifiers,
     };
+}
+
+function getEnabledRollModifiers(checkModifiers){
+    const enabledModifiers = checkModifiers.modifiers.filter((m) => 
+        m.enabled === true
+    );
+    
+    return enabledModifiers;
+}
+
+function getPotentialRollModifiers(checkModifiers){  
+    console.log(checkModifiers);
+    // TODO: change this to check for predicates on subordinate actions instead of Rolloptions that are toggleable
+    const potentialModifiers = checkModifiers.modifiers.filter((m) =>
+        m.rule?.parent.rules.filter(r => 
+            r.key === "RollOption"
+        ).find(r => r.toggleable === true)
+    );
+
+    return potentialModifiers;
 }
 
 export async function applyEffect(actors, effectUUID, effectModifications) {
