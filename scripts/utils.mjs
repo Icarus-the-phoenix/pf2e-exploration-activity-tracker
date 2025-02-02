@@ -1,16 +1,16 @@
 const AVOID_NOTICE_ID = "Compendium.pf2e.actionspf2e.Item.IE2nThCmoyhQA0Jn";
 const DEFEND_ID = "Compendium.pf2e.actionspf2e.Item.cYtYKa1gDEl7y2N0";
-const FOLLOE_THE_EXPERT_ID = "Compendium.pf2e.actionspf2e.Item.tfa4Sh7wcxCEqL29";
+const FOLLOW_THE_EXPERT_ID = "Compendium.pf2e.actionspf2e.Item.tfa4Sh7wcxCEqL29";
 const INVESTIGATE_ID = "Compendium.pf2e.actionspf2e.Item.EwgTZBWsc8qKaViP";
 const SCOUT_ID = "Compendium.pf2e.actionspf2e.Item.kV3XM0YJeS2KCSOb";
 const SEARCH_ID = "Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU";
 
 // TODO: Create Refresh Data and rerender when data is refreshed
 async function getExplorationData(){
-    const partyMembers = game.actors.party.members;
+    const partyMembers = getPartyMembers();
     let activities = {};
     for(const partyMember of partyMembers){
-        if(!partyMember.isOfType("character")) continue;
+        //if(!partyMember.isOfType("character")) continue;
         for(const activityId of partyMember.system.exploration){
             const activity = partyMember.items.get(activityId);
 
@@ -49,19 +49,22 @@ async function getExplorationData(){
                 case DEFEND_ID:
                     // TODO: IDEA is to have defend hook onto combat creation and apply effect with duration lasting until player's turn
                     activities[activity.name].players[partyMember.name].button = {
-                        label: game.i18n.localize("PF2e-EAT.apply-effect-button"),
+                        label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
                         actorId: partyMember.id,
                         dataAction: "applyRaiseAShield"
                     }
                 break;
-                case FOLLOE_THE_EXPERT_ID:
+                case FOLLOW_THE_EXPERT_ID:
 
                 break;
                 case INVESTIGATE_ID:
 
                 break;
                 case SCOUT_ID:
-
+                    activities[activity.name].players[partyMember.name].button = {
+                        label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
+                        dataAction: "applyScout"
+                    }
                 break;
                 case SEARCH_ID:
                     skill = partyMember.perception;
@@ -80,6 +83,10 @@ async function getExplorationData(){
     }));
     console.log(sortedActivities);
     return sortedActivities;
+}
+
+export function getPartyMembers(){
+    return game.actors.party.members.filter((m) => m.isOfType("character"));
 }
 
 function getUserColor(actor){
@@ -140,17 +147,16 @@ export async function applyEffect(actors, effectUUID, effectModifications) {
             const existing = actor.itemTypes.effect.find((e) => e._stats.compendiumSource === effectUUID);
             if (!existing) {
                 const effect = await actor.createEmbeddedDocuments("Item", [source]);
-                console.log(effect);
                 foundry.utils.mergeObject(effect, effectModifications);
             } 
-            else if (effectUUID !== "Compendium.pf2e.other-effects.Item.EMqGwUi3VMhCjTlF"){
-                ui.notifications.info(`${actor.name} already has that effect.`)
+            else {
+                existing.delete();
             }
         }
     } else {
         ui.notifications.error(game.i18n.format("PF2E.ErrorMessage.ItemNotFoundByUUID", { uuid: effectUUID }));
     }
-}   
+}
 
 export {
     getExplorationData
