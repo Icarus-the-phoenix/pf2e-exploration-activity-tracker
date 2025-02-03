@@ -1,5 +1,5 @@
 import { PF2eEATConstants } from "./constants.mjs";
-import { getExplorationData, applyEffect, getPartyMembers } from "./utils.mjs";
+import { getExplorationData, applyEffect, getPartyMembers, htmlClosest } from "./utils.mjs";
 
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -19,7 +19,8 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
             applyScout: this.prototype.applyScout,
             removeEffect: this.prototype.removeEffect,
             reroll: this.prototype.reroll,
-            recallKnowledgeMacro: this.prototype.recallKnowledgeMacro
+            recallKnowledgeMacro: this.prototype.recallKnowledgeMacro,
+            openItemSheet: this.prototype.openItemSheet
         },
         id: "explortion-activity-tracker-app"
     }, {inplace: false});
@@ -61,4 +62,12 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
     applyScout(){
         applyEffect(getPartyMembers(), "Compendium.pf2e.other-effects.Item.EMqGwUi3VMhCjTlF");
     }
+
+    openItemSheet(evt, target){
+        const itemId = htmlClosest(target, "[data-item-id]")?.dataset.itemId;
+        const playerId = htmlClosest(target, "[data-player-id]")?.dataset.playerId;
+        const item = game.actors.get(playerId).items.get(itemId);
+        item.sheet.rendered ? item.sheet.close() : item.sheet.render(true);
+    }
 }
+

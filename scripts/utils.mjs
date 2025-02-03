@@ -5,6 +5,10 @@ const INVESTIGATE_ID = "Compendium.pf2e.actionspf2e.Item.EwgTZBWsc8qKaViP";
 const SCOUT_ID = "Compendium.pf2e.actionspf2e.Item.kV3XM0YJeS2KCSOb";
 const SEARCH_ID = "Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU";
 
+function getPartyMembers(){
+    return game.actors.party.members.filter((m) => m.isOfType("character"));
+}
+
 // TODO: Create Refresh Data and rerender when data is refreshed
 async function getExplorationData(){
     const partyMembers = getPartyMembers();
@@ -19,6 +23,7 @@ async function getExplorationData(){
                 activities[activity.name].players = { ...activities[activity.name].players,
                     [partyMember.name]: {
                         name: partyMember.name,
+                        id: partyMember.id,
                         color: getUserColor(partyMember)
                     }
                 };
@@ -31,6 +36,7 @@ async function getExplorationData(){
                         players: {
                             [partyMember.name]: {
                                 name: partyMember.name,
+                                id: partyMember.id,
                                 color: getUserColor(partyMember)
                             }
                         }
@@ -83,10 +89,6 @@ async function getExplorationData(){
     }));
     console.log(sortedActivities);
     return sortedActivities;
-}
-
-export function getPartyMembers(){
-    return game.actors.party.members.filter((m) => m.isOfType("character"));
 }
 
 function getUserColor(actor){
@@ -161,10 +163,17 @@ function getPotentialRollModifiers(checkModifiers){
         ).find(r => r.toggleable === true)  // Find if toggleable is true
     );
 
+    // TODO: Instead of showing description in tooltip make button clickable to open relevant item.
+    /*potentialModifiers.forEach(async (m) => {
+        console.log(m.rule.parent.description);
+        m.description = await TextEditor.enrichHTML(m.rule.parent.description);
+        console.log(m);
+    });*/
+
     return potentialModifiers;
 }
 
-export async function applyEffect(actors, effectUUID, effectModifications) {
+async function applyEffect(actors, effectUUID, effectModifications) {
     const item = await fromUuid(effectUUID);
     if(!Array.isArray(actors)) actors = [actors];
     if (item?.type === "effect") {
@@ -186,6 +195,13 @@ export async function applyEffect(actors, effectUUID, effectModifications) {
     }
 }
 
+function htmlClosest(child, selectors) {
+    return child instanceof Element ? child.closest(selectors) : null
+}
+
 export {
-    getExplorationData
+    getPartyMembers,
+    getExplorationData,
+    applyEffect,
+    htmlClosest
 }

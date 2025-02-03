@@ -18,6 +18,7 @@
             {{! Create HTML for player's name and misc table columns}}
             {{#each players}}
                 {{! Player's name with color of user}}
+                {{log this}}
                 <th style="text-align: left;"><strong style="color: {{color}};">{{name}}</strong></th>
                 
                 {{! If a roll property exists create HTML for the roll}}
@@ -43,7 +44,11 @@
                         {{! Add modifier boxes for potential modifiers}}
                         <div class="tags modifiers" style="justify-content:center;">
                         {{#each roll.potentialModifiers}}
-                            <span class="tag tag_transparent" data-slug="{{slug}}" data-tooltip="{{{rule.parent.description}}}">?? {{label}} {{isPositive modifier}}{{modifier}}</span>
+                            <span class="tag tag_transparent" 
+                                data-slug="{{slug}}" 
+                                data-action="openItemSheet" 
+                                data-item-id="{{rule.parent.id}}" 
+                                data-player-id="{{../id}}">{{label}} {{isPositive modifier}}{{modifier}}</span>
                         {{/each}}
                         </div>
                     </th>
