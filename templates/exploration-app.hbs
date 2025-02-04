@@ -39,17 +39,18 @@
                         {{#if roll.potentialModifiers}}
                         <hr>
                         <span>Potential Modifiers</span>
-                        {{/if}}
 
                         {{! Add modifier boxes for potential modifiers}}
                         <div class="tags modifiers" style="justify-content:center;">
                         {{#each roll.potentialModifiers}}
                             <span class="tag tag_transparent" 
+                                data-tooltip="Open {{rule.parent.name}}"
                                 data-slug="{{slug}}" 
                                 data-action="openItemSheet" 
                                 data-item-id="{{rule.parent.id}}" 
                                 data-player-id="{{../id}}">{{label}} {{isPositive modifier}}{{modifier}}</span>
                         {{/each}}
+                        {{/if}}
                         </div>
                     </th>
 

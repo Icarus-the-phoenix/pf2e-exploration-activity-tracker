@@ -116,9 +116,10 @@ async function getRollResult(actor, skill, actionSlug, subordinateActionSlug){
     const options = actor.getRollOptions(domains);
     options.push(
         `action:${actionSlug}`,
-        "secret",
-        `action:${subordinateActionSlug}`
+        "secret"
     );
+    if(subordinateActionSlug) options.push(`action:${subordinateActionSlug}`)
+
     const checkModifiers = new game.pf2e.CheckModifier(`${actionSlug} (${skill.label})`, skill);
     const rollData = await game.pf2e.Check.roll(
         checkModifiers, 
@@ -133,8 +134,8 @@ async function getRollResult(actor, skill, actionSlug, subordinateActionSlug){
         }
     );
     const color = getRollColor(rollData.dice[0]);
-    const enabledModifiers = getEnabledRollModifiers(checkModifiers);
-    const potentialModifiers = getPotentialRollModifiers(checkModifiers);
+    const {enabledModifiers, remainingModifiers} = getEnabledRollModifiers(checkModifiers);
+    const potentialModifiers = getPotentialRollModifiers(remainingModifiers, `action:${subordinateActionSlug}`);
     return {
         rollData: {
             total: rollData.total,
@@ -147,30 +148,40 @@ async function getRollResult(actor, skill, actionSlug, subordinateActionSlug){
 }
 
 function getEnabledRollModifiers(checkModifiers){
-    const enabledModifiers = checkModifiers.modifiers.filter((m) => 
-        m.enabled === true
-    );
+    let enabledModifiers = [];
+    let remainingModifiers = [];
+
+    checkModifiers.modifiers.forEach((m) => {
+        m.enabled ? enabledModifiers.push(m) : remainingModifiers.push(m)
+    });
     
-    return enabledModifiers;
+    return {enabledModifiers: enabledModifiers, remainingModifiers: remainingModifiers};
 }
 
-function getPotentialRollModifiers(checkModifiers){  
-    console.log(checkModifiers);
-    // TODO: change this to check for predicates on subordinate actions instead of Rolloptions that are toggleable
-    const potentialModifiers = checkModifiers.modifiers.filter((m) =>
-        m.rule?.parent.rules.filter(r =>    // Get parent of modifier with a rule element
-            r.key === "RollOption"          // Check if any of the parents children is a RollOption Rule Element
-        ).find(r => r.toggleable === true)  // Find if toggleable is true
-    );
-
-    // TODO: Instead of showing description in tooltip make button clickable to open relevant item.
-    /*potentialModifiers.forEach(async (m) => {
-        console.log(m.rule.parent.description);
-        m.description = await TextEditor.enrichHTML(m.rule.parent.description);
-        console.log(m);
-    });*/
+// Check's Modifier's predicates to see if any match the predicateToSearch
+function getPotentialRollModifiers(checkModifiers, predicateToSearch){  
+    const potentialModifiers = checkModifiers?.filter((m)=>
+        isStringInObject(m.predicate, predicateToSearch)
+    );    
 
     return potentialModifiers;
+}
+
+function isStringInObject(obj, string){
+    const found = Object.keys(obj).some(key => {
+        if(typeof obj[key] === "object"){
+            return isStringInObject(obj[key], string);
+        }
+        if(typeof obj[key] === "string"){
+            if(obj[key] === string){
+                return true;
+            }
+            else{
+            }
+        }
+    });
+    console.log(found);
+    return found;
 }
 
 async function applyEffect(actors, effectUUID, effectModifications) {
@@ -194,6 +205,8 @@ async function applyEffect(actors, effectUUID, effectModifications) {
         ui.notifications.error(game.i18n.format("PF2E.ErrorMessage.ItemNotFoundByUUID", { uuid: effectUUID }));
     }
 }
+
+
 
 function htmlClosest(child, selectors) {
     return child instanceof Element ? child.closest(selectors) : null
