@@ -61,7 +61,7 @@ async function getExplorationData(){
                     }
                 break;
                 case FOLLOW_THE_EXPERT_ID:
-
+                    
                 break;
                 case INVESTIGATE_ID:
 
@@ -113,12 +113,12 @@ function getRollColor(dieRoll){
 
 async function getRollResult(actor, skill, actionSlug, subordinateActionSlug){
     const domains = ['all', 'check', 'skill-check', `${skill.slug}`, `${skill.slug}-check`, `${skill.attribute}-based`, `${skill.attribute}-skill-check`]
+    const actionPredicates = [`action:${actionSlug}`];
+    if(subordinateActionSlug) actionPredicates.push(`action:${subordinateActionSlug}`);
     const options = actor.getRollOptions(domains);
-    options.push(
-        `action:${actionSlug}`,
-        "secret"
-    );
-    if(subordinateActionSlug) options.push(`action:${subordinateActionSlug}`)
+    options.push("secret");
+    options.push(actionPredicates);
+
 
     const checkModifiers = new game.pf2e.CheckModifier(`${actionSlug} (${skill.label})`, skill);
     const rollData = await game.pf2e.Check.roll(
@@ -135,7 +135,7 @@ async function getRollResult(actor, skill, actionSlug, subordinateActionSlug){
     );
     const color = getRollColor(rollData.dice[0]);
     const {enabledModifiers, remainingModifiers} = getEnabledRollModifiers(checkModifiers);
-    const potentialModifiers = getPotentialRollModifiers(remainingModifiers, `action:${subordinateActionSlug}`);
+    const potentialModifiers = getPotentialRollModifiers(remainingModifiers, actionPredicates);
     return {
         rollData: {
             total: rollData.total,
@@ -159,28 +159,25 @@ function getEnabledRollModifiers(checkModifiers){
 }
 
 // Check's Modifier's predicates to see if any match the predicateToSearch
-function getPotentialRollModifiers(checkModifiers, predicateToSearch){  
+function getPotentialRollModifiers(checkModifiers, predicatesToSearch){  
     const potentialModifiers = checkModifiers?.filter((m)=>
-        isStringInObject(m.predicate, predicateToSearch)
+        isStringInObject(m.predicate, predicatesToSearch)
     );    
 
     return potentialModifiers;
 }
 
-function isStringInObject(obj, string){
+function isStringInObject(obj, strings){
     const found = Object.keys(obj).some(key => {
         if(typeof obj[key] === "object"){
-            return isStringInObject(obj[key], string);
+            return isStringInObject(obj[key], strings);
         }
         if(typeof obj[key] === "string"){
-            if(obj[key] === string){
-                return true;
-            }
-            else{
-            }
+            return strings.some((s) => {
+                return obj[key] === s
+            });
         }
     });
-    console.log(found);
     return found;
 }
 
