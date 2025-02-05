@@ -1,9 +1,14 @@
-const AVOID_NOTICE_ID = "Compendium.pf2e.actionspf2e.Item.IE2nThCmoyhQA0Jn";
-const DEFEND_ID = "Compendium.pf2e.actionspf2e.Item.cYtYKa1gDEl7y2N0";
-const FOLLOW_THE_EXPERT_ID = "Compendium.pf2e.actionspf2e.Item.tfa4Sh7wcxCEqL29";
-const INVESTIGATE_ID = "Compendium.pf2e.actionspf2e.Item.EwgTZBWsc8qKaViP";
-const SCOUT_ID = "Compendium.pf2e.actionspf2e.Item.kV3XM0YJeS2KCSOb";
-const SEARCH_ID = "Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU";
+const SUPPORTED_ACTIVITIES = {
+    AVOID_NOTICE_ID : "Compendium.pf2e.actionspf2e.Item.IE2nThCmoyhQA0Jn",
+    DEFEND_ID :"Compendium.pf2e.actionspf2e.Item.cYtYKa1gDEl7y2N0",
+    FOLLOW_THE_EXPERT_ID : "Compendium.pf2e.actionspf2e.Item.tfa4Sh7wcxCEqL29",
+    GATHER_INFORMATION_ID : "Compendium.pf2e.actionspf2e.Item.plBGdZhqq5JBl1D8",
+    IMPERSONATE_ID : "Compendium.pf2e.actionspf2e.Item.AJstokjdG6iDjVjE",
+    INVESTIGATE_ID : "Compendium.pf2e.actionspf2e.Item.EwgTZBWsc8qKaViP",
+    SCOUT_ID : "Compendium.pf2e.actionspf2e.Item.kV3XM0YJeS2KCSOb",
+    SEARCH_ID : "Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU",
+    TRACK_ID : "Compendium.pf2e.actionspf2e.Item.EA5vuSgJfiHH7plD",
+}
 
 function getPartyMembers(){
     return game.actors.party.members.filter((m) => m.isOfType("character"));
@@ -14,7 +19,6 @@ async function getExplorationData(){
     const partyMembers = getPartyMembers();
     let activities = {};
     for(const partyMember of partyMembers){
-        //if(!partyMember.isOfType("character")) continue;
         for(const activityId of partyMember.system.exploration){
             const activity = partyMember.items.get(activityId);
 
@@ -46,13 +50,16 @@ async function getExplorationData(){
 
             // Add data to activities object based on if requires Roll, Buttons, or tips
             let skill, result;
+            const activityName = activities[activity.name].name;            
             switch(activity.sourceId){
-                case AVOID_NOTICE_ID:
+                // Avoid Notice
+                case SUPPORTED_ACTIVITIES.AVOID_NOTICE_ID:
                     skill = partyMember.skills.stealth;
-                    result = await getRollResult(partyMember, skill, "avoid-notice");
+                    result = await getRollResult(partyMember, skill, activityName, "avoid-notice");
                     activities[activity.name].players[partyMember.name].roll = result;
                 break;
-                case DEFEND_ID:
+                // Defend
+                case SUPPORTED_ACTIVITIES.DEFEND_ID:
                     // TODO: IDEA is to have defend hook onto combat creation and apply effect with duration lasting until player's turn
                     activities[activity.name].players[partyMember.name].button = {
                         label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
@@ -60,22 +67,44 @@ async function getExplorationData(){
                         dataAction: "applyRaiseAShield"
                     }
                 break;
-                case FOLLOW_THE_EXPERT_ID:
+                // Follow the Expert
+                case SUPPORTED_ACTIVITIES.FOLLOW_THE_EXPERT_ID:
                     
                 break;
-                case INVESTIGATE_ID:
+                // Gather Information
+                case SUPPORTED_ACTIVITIES.GATHER_INFORMATION_ID:
+                    skill = partyMember.skills.diplomacy;
+                    result = await getRollResult(partyMember, skill, activityName, "gather-information");
+                    activities[activity.name].players[partyMember.name].roll = result;  
+                break;
+                // Impersonate
+                case SUPPORTED_ACTIVITIES.IMPERSONATE_ID:
+                    skill = partyMember.skills.deception;
+                    result = await getRollResult(partyMember, skill, activityName, "impersonate");
+                    activities[activity.name].players[partyMember.name].roll = result;  
+                break;
+                // Investigate
+                case SUPPORTED_ACTIVITIES.INVESTIGATE_ID:
 
                 break;
-                case SCOUT_ID:
+                // Scout
+                case SUPPORTED_ACTIVITIES.SCOUT_ID:
                     activities[activity.name].players[partyMember.name].button = {
                         label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
                         dataAction: "applyScout"
                     }
                 break;
-                case SEARCH_ID:
+                // Search
+                case SUPPORTED_ACTIVITIES.SEARCH_ID:
                     skill = partyMember.perception;
-                    result = await getRollResult(partyMember, skill, "search", "seek");
+                    result = await getRollResult(partyMember, skill, activityName, "search", "seek");
                     activities[activity.name].players[partyMember.name].roll = result;                  
+                break;
+                // Track
+                case SUPPORTED_ACTIVITIES.TRACK_ID:
+                    skill = partyMember.skills.survival;
+                    result = await getRollResult(partyMember, skill, activityName, "track");
+                    activities[activity.name].players[partyMember.name].roll = result;      
                 break;
             }
         }
@@ -88,6 +117,7 @@ async function getExplorationData(){
         return 0;
     }));
     console.log(sortedActivities);
+
     return sortedActivities;
 }
 
@@ -111,16 +141,18 @@ function getRollColor(dieRoll){
     return color;
 }
 
-async function getRollResult(actor, skill, actionSlug, subordinateActionSlug){
+async function getRollResult(actor, skill, actionName, actionSlug, subordinateActionSlug){
     const domains = ['all', 'check', 'skill-check', `${skill.slug}`, `${skill.slug}-check`, `${skill.attribute}-based`, `${skill.attribute}-skill-check`]
+    
     const actionPredicates = [`action:${actionSlug}`];
     if(subordinateActionSlug) actionPredicates.push(`action:${subordinateActionSlug}`);
+    
     const options = actor.getRollOptions(domains);
     options.push("secret");
-    options.push(actionPredicates);
+    actionPredicates.forEach((p) => {options.push(p)});
 
 
-    const checkModifiers = new game.pf2e.CheckModifier(`${actionSlug} (${skill.label})`, skill);
+    const checkModifiers = new game.pf2e.CheckModifier(`${actionName} (${skill.label})`, skill);
     const rollData = await game.pf2e.Check.roll(
         checkModifiers, 
         {
@@ -160,9 +192,9 @@ function getEnabledRollModifiers(checkModifiers){
 
 // Check's Modifier's predicates to see if any match the predicateToSearch
 function getPotentialRollModifiers(checkModifiers, predicatesToSearch){  
-    const potentialModifiers = checkModifiers?.filter((m)=>
-        isStringInObject(m.predicate, predicatesToSearch)
-    );    
+    const potentialModifiers = checkModifiers?.
+        filter((m) => m.type !== "proficiency").                            // Filter out proficiency modifiers
+        filter((m) => isStringInObject(m.predicate, predicatesToSearch));   // Checks for predicates matching
 
     return potentialModifiers;
 }

@@ -31,7 +31,14 @@
                         {{! Add modifier boxes for enabled modifiers }}
                         <div class="tags modifiers" style="justify-content:center;">
                         {{#each roll.enabledModifiers}}
-                            <span class="tag tag_transparent" data-slug="{{slug}}">{{label}} {{isPositive modifier}}{{modifier}}</span>
+                            <span class="tag tag_transparent" 
+                                data-slug="{{slug}}"
+                                {{#if rule.parent.id}}
+                                data-tooltip="Open [{{rule.parent.name}}]"
+                                data-action="openItemSheet"
+                                data-item-id="{{rule.parent.id}}"
+                                data-player-id="{{../id}}"
+                                {{/if}}>{{label}} {{isPositive modifier}}{{modifier}}</span>
                         {{/each}}
                         </div>
 
@@ -43,11 +50,13 @@
                         <div class="tags modifiers" style="justify-content:center;">
                         {{#each roll.potentialModifiers}}
                             <span class="tag tag_transparent" 
-                                data-tooltip="Open {{rule.parent.name}}"
                                 data-slug="{{slug}}" 
+                                {{#if rule.parent.id}}
+                                data-tooltip="Open [{{rule.parent.name}}]"
                                 data-action="openItemSheet" 
                                 data-item-id="{{rule.parent.id}}" 
-                                data-player-id="{{../id}}">{{label}} {{isPositive modifier}}{{modifier}}</span>
+                                data-player-id="{{../id}}"
+                                {{/if}}>{{label}} {{isPositive modifier}}{{modifier}}</span>
                         {{/each}}
                         {{/if}}
                         </div>
