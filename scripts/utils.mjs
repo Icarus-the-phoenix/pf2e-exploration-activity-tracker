@@ -15,6 +15,7 @@ function getPartyMembers(){
 }
 
 // TODO: Create Refresh Data and rerender when data is refreshed
+// TODO: Split Activities into Supported and Unsupported. Unsupported activities will only have 2 columns
 async function getExplorationData(){
     const partyMembers = getPartyMembers();
     let activities = {};
@@ -49,8 +50,8 @@ async function getExplorationData(){
             }
 
             // Add data to activities object based on if requires Roll, Buttons, or tips
-            let skill, result;
-            const activityName = activities[activity.name].name;            
+            const activityName = activities[activity.name].name;
+            let skill, result;             
             switch(activity.sourceId){
                 // Avoid Notice
                 case SUPPORTED_ACTIVITIES.AVOID_NOTICE_ID:

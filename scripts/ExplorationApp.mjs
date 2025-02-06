@@ -5,6 +5,7 @@ import { getExplorationData, applyEffect, getPartyMembers, htmlClosest } from ".
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
     static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
+        id: "explortion-activity-tracker-app",
         window:{
             title:"Exploration Activity Tracker",
             icon:"fa-solid fa-trees"
@@ -12,7 +13,8 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         position: {
             top: 100,
             left: 100,
-            width: 600
+            width: 600,
+            height: 800
         },
         actions: {
             applyRaiseAShield: this.prototype.applyRaiseAShield,
@@ -21,8 +23,7 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
             reroll: this.prototype.reroll,
             recallKnowledgeMacro: this.prototype.recallKnowledgeMacro,
             openItemSheet: this.prototype.openItemSheet
-        },
-        id: "explortion-activity-tracker-app"
+        }
     }, {inplace: false});
 
     constructor(options ={}){
@@ -37,9 +38,9 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         }
     }
 
+    // TODO: figure out scrollable
     static PARTS = {
-        body: { template: PF2eEATConstants.TEMPLATES.EXPLORATIONAPP },
-        footer: { template: `templates/generic/form-footer.hbs` }
+        body: { template: PF2eEATConstants.TEMPLATES.EXPLORATIONAPP }
     }
 
     async _prepareContext(partId, context) {     
@@ -47,11 +48,7 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         const activities = this.activities;
 
         return {
-            activities,
-            buttons: [
-                { type: "submit", icon: "fa-solid fa-rotate-right", label: "Refresh" },
-                { type: "reset", action: "reset", icon: "fa-solid fa-undo", label: "SETTINGS.Reset" },
-            ]
+            activities
         }
     }
 
