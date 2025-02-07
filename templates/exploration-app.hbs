@@ -1,5 +1,10 @@
 <div class="pf2e-eat scrollable">
     <table class="exploration-table">
+
+        {{! --------------- Suported Activities ------------------}}
+        <tr>
+            <th colspan="3">Supported Activities</th>
+        </tr>
         <tr>
             <th>Activity</th>
             <th>Name</th>
@@ -7,7 +12,7 @@
         </tr>
 
         {{! Create HTML for each activity, each player using them, and misc data like roll results and buttons}}
-        {{#each activities}}
+        {{#each activities.supportedActivities}}
         <tr>
             
             {{! Create HTML for activity column and make is span a number of rows to match how many players are using it}}
@@ -26,7 +31,7 @@
                         {{! Add Roll result}} 
                         <span style="{{roll.rollData.color}}" data-tooltip="{{roll.rollData.result}}">{{roll.rollData.total}}</span>
 
-                        <i class="fa-solid fa-rotate rotate"></i>
+                        <a><i class="fa-solid fa-rotate rotate clickable-icon"></i></a>
 
                         {{! Add modifier boxes for enabled modifiers }}
                         <div class="tags modifiers" style="justify-content:center;">
@@ -74,5 +79,29 @@
             {{/each}}
         </tr>
         {{/each}}
+    </table>
+
+    {{! --------------  Other Activities  -----------------}}
+    <table class="exploration-table">
+        <tr>
+            <th colspan="2">Other Activities</th>
+        </tr>
+        <tr>
+            <th>Activity</th>
+            <th>Name</th>
+        </tr>
+        {{#each activities.otherActivities}}
+        <tr>
+            {{! Create HTML for activity column and make is span a number of rows to match how many players are using it}}
+            <th rowspan="{{eat-obj-length players}}">
+                {{{enrichedHTML}}}
+            </th>
+            {{! Create HTML for player's name and misc table columns}}
+            {{#each players}}
+                {{! Player's name with color of user}}
+                <th style="text-align: left;"><strong style="color: {{color}};">{{name}}</strong></th>
+            {{/each}}
+        </tr>       
+        {{/each}}   
     </table>
 </div>

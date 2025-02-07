@@ -22,15 +22,17 @@ Hooks.once("init", () => {
 });
 
 Hooks.on("renderPlayerList", (playerlist, [html]) => {
-    const buttonHtml = `
-        <button class="exploration-button">
-            <i class="window-icon fa-fw fa-solid fa-trees"></i>
-            Exploration
-        </button>
-    `
-    html.insertAdjacentHTML("beforeend",`${buttonHtml}`);
-    
-    html.querySelector('.exploration-button').addEventListener('click', ev => {
-        new ExplorationApp().render({force:true});
-    })
+    if(game.user.isGM){
+            const buttonHtml = `
+            <button class="exploration-button">
+                <i class="window-icon fa-fw fa-solid fa-trees"></i>
+                Exploration
+            </button>
+        `
+        html.insertAdjacentHTML("beforeend",`${buttonHtml}`);
+        
+        html.querySelector('.exploration-button').addEventListener('click', ev => {
+            new ExplorationApp().render({force:true});
+        })
+    }
 });

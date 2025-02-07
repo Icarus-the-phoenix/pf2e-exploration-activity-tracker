@@ -18,108 +18,146 @@ function getPartyMembers(){
 // TODO: Split Activities into Supported and Unsupported. Unsupported activities will only have 2 columns
 async function getExplorationData(){
     const partyMembers = getPartyMembers();
-    let activities = {};
+    let supportedActivities = {};
+    let otherActivities = {};
     for(const partyMember of partyMembers){
         for(const activityId of partyMember.system.exploration){
             const activity = partyMember.items.get(activityId);
 
-            // If activity already exist in activities add to that instead of creating another.
-            if(activities[activity.name]){
-                activities[activity.name].players = { ...activities[activity.name].players,
-                    [partyMember.name]: {
-                        name: partyMember.name,
-                        id: partyMember.id,
-                        color: getUserColor(partyMember)
+            //If supported add data to supported activities
+            if(Object.values(SUPPORTED_ACTIVITIES).includes(activity.sourceId)){
+                if(supportedActivities[activity.name]){
+                    supportedActivities[activity.name].players = { ...supportedActivities[activity.name].players,
+                        [partyMember.name]: {
+                            name: partyMember.name,
+                            id: partyMember.id,
+                            color: getUserColor(partyMember)
+                        }
+                    };
+                }
+                else{
+                    supportedActivities = {...supportedActivities,
+                        [activity.name]:{
+                            name: activity.name,
+                            enrichedHTML: await TextEditor.enrichHTML(`@UUID[${activity.sourceId}]`),
+                            players: {
+                                [partyMember.name]: {
+                                    name: partyMember.name,
+                                    id: partyMember.id,
+                                    color: getUserColor(partyMember)
+                                }
+                            }
+                        }
                     }
-                };
+                }
+
+                // Add data to activities object based on if requires Roll, Buttons, or tips
+                const activityName = supportedActivities[activity.name].name;
+                let skill, result;             
+                switch(activity.sourceId){
+                    // Avoid Notice
+                    case SUPPORTED_ACTIVITIES.AVOID_NOTICE_ID:
+                        skill = partyMember.skills.stealth;
+                        result = await getRollResult(partyMember, skill, activityName, "avoid-notice");
+                        supportedActivities[activity.name].players[partyMember.name].roll = result;
+                    break;
+                    // Defend
+                    case SUPPORTED_ACTIVITIES.DEFEND_ID:
+                        // TODO: IDEA is to have defend hook onto combat creation and apply effect with duration lasting until player's turn
+                        supportedActivities[activity.name].players[partyMember.name].button = {
+                            label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
+                            actorId: partyMember.id,
+                            dataAction: "applyRaiseAShield"
+                        }
+                    break;
+                    // Follow the Expert
+                    case SUPPORTED_ACTIVITIES.FOLLOW_THE_EXPERT_ID:
+                        
+                    break;
+                    // Gather Information
+                    case SUPPORTED_ACTIVITIES.GATHER_INFORMATION_ID:
+                        skill = partyMember.skills.diplomacy;
+                        result = await getRollResult(partyMember, skill, activityName, "gather-information");
+                        supportedActivities[activity.name].players[partyMember.name].roll = result;  
+                    break;
+                    // Impersonate
+                    case SUPPORTED_ACTIVITIES.IMPERSONATE_ID:
+                        skill = partyMember.skills.deception;
+                        result = await getRollResult(partyMember, skill, activityName, "impersonate");
+                        supportedActivities[activity.name].players[partyMember.name].roll = result;
+                    break;
+                    // Investigate
+                    case SUPPORTED_ACTIVITIES.INVESTIGATE_ID:
+
+                    break;
+                    // Scout
+                    case SUPPORTED_ACTIVITIES.SCOUT_ID:
+                        supportedActivities[activity.name].players[partyMember.name].button = {
+                            label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
+                            dataAction: "applyScout"
+                        }
+                    break;
+                    // Search
+                    case SUPPORTED_ACTIVITIES.SEARCH_ID:
+                        skill = partyMember.perception;
+                        result = await getRollResult(partyMember, skill, activityName, "search", "seek");
+                        supportedActivities[activity.name].players[partyMember.name].roll = result;                  
+                    break;
+                    // Track
+                    case SUPPORTED_ACTIVITIES.TRACK_ID:
+                        skill = partyMember.skills.survival;
+                        result = await getRollResult(partyMember, skill, activityName, "track");
+                        supportedActivities[activity.name].players[partyMember.name].roll = result;
+                    break;
+                }
             }
-            else{
-                activities = {...activities,
-                    [activity.name]:{
-                        name: activity.name,
-                        enrichedHTML: await TextEditor.enrichHTML(`@UUID[${activity.sourceId}]`),
-                        players: {
-                            [partyMember.name]: {
-                                name: partyMember.name,
-                                id: partyMember.id,
-                                color: getUserColor(partyMember)
+            else {
+                if(otherActivities[activity.name]){
+                    otherActivities[activity.name].players = { ...otherActivities[activity.name].players,
+                        [partyMember.name]: {
+                            name: partyMember.name,
+                            id: partyMember.id,
+                            color: getUserColor(partyMember)
+                        }
+                    };
+                }
+                else{
+                    otherActivities = {...otherActivities,
+                        [activity.name]:{
+                            name: activity.name,
+                            enrichedHTML: await TextEditor.enrichHTML(`@UUID[${activity.sourceId}]`),
+                            players: {
+                                [partyMember.name]: {
+                                    name: partyMember.name,
+                                    id: partyMember.id,
+                                    color: getUserColor(partyMember)
+                                }
                             }
                         }
                     }
                 }
             }
-
-            // Add data to activities object based on if requires Roll, Buttons, or tips
-            const activityName = activities[activity.name].name;
-            let skill, result;             
-            switch(activity.sourceId){
-                // Avoid Notice
-                case SUPPORTED_ACTIVITIES.AVOID_NOTICE_ID:
-                    skill = partyMember.skills.stealth;
-                    result = await getRollResult(partyMember, skill, activityName, "avoid-notice");
-                    activities[activity.name].players[partyMember.name].roll = result;
-                break;
-                // Defend
-                case SUPPORTED_ACTIVITIES.DEFEND_ID:
-                    // TODO: IDEA is to have defend hook onto combat creation and apply effect with duration lasting until player's turn
-                    activities[activity.name].players[partyMember.name].button = {
-                        label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
-                        actorId: partyMember.id,
-                        dataAction: "applyRaiseAShield"
-                    }
-                break;
-                // Follow the Expert
-                case SUPPORTED_ACTIVITIES.FOLLOW_THE_EXPERT_ID:
-                    
-                break;
-                // Gather Information
-                case SUPPORTED_ACTIVITIES.GATHER_INFORMATION_ID:
-                    skill = partyMember.skills.diplomacy;
-                    result = await getRollResult(partyMember, skill, activityName, "gather-information");
-                    activities[activity.name].players[partyMember.name].roll = result;  
-                break;
-                // Impersonate
-                case SUPPORTED_ACTIVITIES.IMPERSONATE_ID:
-                    skill = partyMember.skills.deception;
-                    result = await getRollResult(partyMember, skill, activityName, "impersonate");
-                    activities[activity.name].players[partyMember.name].roll = result;  
-                break;
-                // Investigate
-                case SUPPORTED_ACTIVITIES.INVESTIGATE_ID:
-
-                break;
-                // Scout
-                case SUPPORTED_ACTIVITIES.SCOUT_ID:
-                    activities[activity.name].players[partyMember.name].button = {
-                        label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
-                        dataAction: "applyScout"
-                    }
-                break;
-                // Search
-                case SUPPORTED_ACTIVITIES.SEARCH_ID:
-                    skill = partyMember.perception;
-                    result = await getRollResult(partyMember, skill, activityName, "search", "seek");
-                    activities[activity.name].players[partyMember.name].roll = result;                  
-                break;
-                // Track
-                case SUPPORTED_ACTIVITIES.TRACK_ID:
-                    skill = partyMember.skills.survival;
-                    result = await getRollResult(partyMember, skill, activityName, "track");
-                    activities[activity.name].players[partyMember.name].roll = result;      
-                break;
-            }
         }
     }
 
     // Turn activities into Array for sorting then back into object
-    const sortedActivities = Object.fromEntries(Object.entries(activities).sort((a, b) => {
+    supportedActivities = Object.fromEntries(Object.entries(supportedActivities).sort((a, b) => {
         if(a[1].name < b[1].name) { return -1; }
         if(a[1].name > b[1].name) { return 1; }
         return 0;
     }));
-    console.log(sortedActivities);
 
-    return sortedActivities;
+    // Turn activities into Array for sorting then back into object
+    otherActivities = Object.fromEntries(Object.entries(otherActivities).sort((a, b) => {
+        if(a[1].name < b[1].name) { return -1; }
+        if(a[1].name > b[1].name) { return 1; }
+        return 0;
+    }));
+
+    const activities = {supportedActivities, otherActivities}
+    console.log(activities);
+
+    return activities;
 }
 
 function getUserColor(actor){
@@ -166,6 +204,7 @@ async function getRollResult(actor, skill, actionName, actionSlug, subordinateAc
             skipDialog: true
         }
     );
+    console.log(rollData);
     const color = getRollColor(rollData.dice[0]);
     const {enabledModifiers, remainingModifiers} = getEnabledRollModifiers(checkModifiers);
     const potentialModifiers = getPotentialRollModifiers(remainingModifiers, actionPredicates);
