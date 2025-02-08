@@ -31,6 +31,14 @@
     border-bottom: 1px solid var(--color-border-light-tertiary);
 }
 
+.pf2e-eat .player-name {
+    text-shadow: 
+        -1px -1px 0 var(--color-cool-5-50),
+        1px -1px 0 var(--color-cool-5-50),
+        -1px 1px 0 var(--color-cool-5-50),
+        1px 1px 0 var(--color-cool-5-50);
+}
+
 .pf2e-eat .exploration-table tr:last-child {
     border-bottom: 1px solid var(--color-border-highlight);
 }
