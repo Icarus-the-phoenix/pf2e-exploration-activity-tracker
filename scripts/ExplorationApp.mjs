@@ -1,5 +1,5 @@
 import { PF2eEATConstants } from "./constants.mjs";
-import { getExplorationData, applyEffect, getPartyMembers, htmlClosest } from "./utils.mjs";
+import { getExplorationData, applyEffect, getPartyMembers, htmlClosest, getRollColor } from "./utils.mjs";
 
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -30,7 +30,7 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         super(options);
         const existing = foundry.applications.instances.get(this.constructor.DEFAULT_OPTIONS.id);
         if(existing){
-            existing.activities = { };
+            //existing.activities = { };
             return existing;
         }
         else{
@@ -40,11 +40,15 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // TODO: figure out scrollable
     static PARTS = {
-        body: { template: PF2eEATConstants.TEMPLATES.EXPLORATIONAPP }
+        body: { template: PF2eEATConstants.TEMPLATES.EXPLORATIONAPP, scrollable: [''] }
     }
 
     async _prepareContext(partId, context) {     
-        this.activities = await getExplorationData();
+        // Create Activities if non-exist
+        if(Object.keys(this.activities).length === 0){
+            this.activities = await getExplorationData();
+        }
+
         const activities = this.activities;
 
         return {
@@ -60,9 +64,35 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         applyEffect(getPartyMembers(), "Compendium.pf2e.other-effects.Item.EMqGwUi3VMhCjTlF");
     }
 
+    // TODO: Store Data needed for roll in activities and reroll.
+    async reroll(evt, target){
+        const activities = this.activities;
+
+        const htmlDOM = htmlClosest(target, "[data-activity-name]");
+        const activityName = htmlDOM?.dataset.activityName;
+        const actorName = htmlDOM?.dataset.actorName;
+        const totalModifier = htmlDOM?.dataset.totalModifier;
+        const roll = await new Roll("1d20").evaluate();
+        const color = getRollColor(roll);
+
+        activities[activityName].players[actorName].roll.rollValue = roll.total;
+        activities[activityName].players[actorName].roll.color = color;
+
+        /*
+        const rollHtml = target.previousElementSibling;
+        rollHtml.setAttribute("style", color);
+        rollHtml.setAttribute("data-tooltip", `${roll.total} + ${totalModifier}`);
+        rollHtml.innerHTML = `${roll.total+totalModifier}`
+        */
+
+        this.activities = activities;
+        this.render(true);
+    }
+
     openItemSheet(evt, target){
-        const itemId = htmlClosest(target, "[data-item-id]")?.dataset.itemId;
-        const playerId = htmlClosest(target, "[data-player-id]")?.dataset.playerId;
+        const htmlDOM = htmlClosest(target, "[data-item-id]");
+        const itemId = htmlDOM?.dataset.itemId;
+        const playerId = htmlDOM?.dataset.playerId;
         const item = game.actors.get(playerId).items.get(itemId);
         item.sheet.rendered ? item.sheet.close() : item.sheet.render(true);
     }

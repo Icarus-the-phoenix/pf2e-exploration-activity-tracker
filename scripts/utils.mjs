@@ -14,35 +14,32 @@ function getPartyMembers(){
     return game.actors.party.members.filter((m) => m.isOfType("character"));
 }
 
-// TODO: Create Refresh Data and rerender when data is refreshed
 async function getExplorationData(){
     const partyMembers = getPartyMembers();
-    let supportedActivities = {};
-    let otherActivities = {};
+    let activities = {};
     for(const partyMember of partyMembers){
         for(const activityId of partyMember.system.exploration){
             const activity = partyMember.items.get(activityId);
 
             //If supported add data to supported activities
             if(Object.values(SUPPORTED_ACTIVITIES).includes(activity?.sourceId)){
-                if(supportedActivities[activity.name]){
-                    supportedActivities[activity.name].players = { ...supportedActivities[activity.name].players,
+                if(activities[activity.name]){
+                    activities[activity.name].players = { ...activities[activity.name].players,
                         [partyMember.name]: {
-                            name: partyMember.name,
-                            id: partyMember.id,
+                            actor: partyMember,
                             color: getUserColor(partyMember)
                         }
                     };
                 }
                 else{
-                    supportedActivities = {...supportedActivities,
+                    activities = {...activities,
                         [activity.name]:{
-                            name: activity.name,
+                            activity: activity,
+                            supported: true,
                             enrichedHTML: await TextEditor.enrichHTML(`@UUID[${activity.sourceId}]`),
                             players: {
                                 [partyMember.name]: {
-                                    name: partyMember.name,
-                                    id: partyMember.id,
+                                    actor: partyMember,
                                     color: getUserColor(partyMember)
                                 }
                             }
@@ -50,20 +47,18 @@ async function getExplorationData(){
                     }
                 }
 
-                // Add data to activities object based on if requires Roll, Buttons, or tips
-                const activityName = supportedActivities[activity.name].name;
                 let skill, result;             
                 switch(activity.sourceId){
                     // Avoid Notice
                     case SUPPORTED_ACTIVITIES.AVOID_NOTICE_ID:
                         skill = partyMember.skills.stealth;
-                        result = await getRollResult(partyMember, skill, activityName, "avoid-notice");
-                        supportedActivities[activity.name].players[partyMember.name].roll = result;
+                        result = await getRollResult(partyMember, skill, activity.name);
+                        activities[activity.name].players[partyMember.name].roll = result;
                     break;
                     // Defend
                     case SUPPORTED_ACTIVITIES.DEFEND_ID:
                         // TODO: IDEA is to have defend hook onto combat creation and apply effect with duration lasting until player's turn
-                        supportedActivities[activity.name].players[partyMember.name].button = {
+                        activities[activity.name].players[partyMember.name].button = {
                             label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
                             actorId: partyMember.id,
                             dataAction: "applyRaiseAShield"
@@ -76,14 +71,14 @@ async function getExplorationData(){
                     // Gather Information
                     case SUPPORTED_ACTIVITIES.GATHER_INFORMATION_ID:
                         skill = partyMember.skills.diplomacy;
-                        result = await getRollResult(partyMember, skill, activityName, "gather-information");
-                        supportedActivities[activity.name].players[partyMember.name].roll = result;  
+                        result = await getRollResult(partyMember, skill, activity.name);
+                        activities[activity.name].players[partyMember.name].roll = result;  
                     break;
                     // Impersonate
                     case SUPPORTED_ACTIVITIES.IMPERSONATE_ID:
                         skill = partyMember.skills.deception;
-                        result = await getRollResult(partyMember, skill, activityName, "impersonate");
-                        supportedActivities[activity.name].players[partyMember.name].roll = result;
+                        result = await getRollResult(partyMember, skill, activity.name);
+                        activities[activity.name].players[partyMember.name].roll = result;
                     break;
                     // Investigate
                     case SUPPORTED_ACTIVITIES.INVESTIGATE_ID:
@@ -91,7 +86,7 @@ async function getExplorationData(){
                     break;
                     // Scout
                     case SUPPORTED_ACTIVITIES.SCOUT_ID:
-                        supportedActivities[activity.name].players[partyMember.name].button = {
+                        activities[activity.name].players[partyMember.name].button = {
                             label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
                             dataAction: "applyScout"
                         }
@@ -99,36 +94,35 @@ async function getExplorationData(){
                     // Search
                     case SUPPORTED_ACTIVITIES.SEARCH_ID:
                         skill = partyMember.perception;
-                        result = await getRollResult(partyMember, skill, activityName, "search", "seek");
-                        supportedActivities[activity.name].players[partyMember.name].roll = result;                  
+                        result = await getRollResult(partyMember, skill, activity.name, "seek");
+                        activities[activity.name].players[partyMember.name].roll = result;                  
                     break;
                     // Track
                     case SUPPORTED_ACTIVITIES.TRACK_ID:
                         skill = partyMember.skills.survival;
-                        result = await getRollResult(partyMember, skill, activityName, "track");
-                        supportedActivities[activity.name].players[partyMember.name].roll = result;
+                        result = await getRollResult(partyMember, skill, activity.name);
+                        activities[activity.name].players[partyMember.name].roll = result;
                     break;
                 }
             }
             else {
-                if(otherActivities[activity.name]){
-                    otherActivities[activity.name].players = { ...otherActivities[activity.name].players,
+                if(activities[activity.name]){
+                    activities[activity.name].players = { ...activities[activity.name].players,
                         [partyMember.name]: {
-                            name: partyMember.name,
-                            id: partyMember.id,
+                            actor: partyMember,
                             color: getUserColor(partyMember)
                         }
                     };
                 }
                 else{
-                    otherActivities = {...otherActivities,
+                    activities = {...activities,
                         [activity.name]:{
-                            name: activity.name,
+                            activity: activity,
+                            unsupported: true,
                             enrichedHTML: await TextEditor.enrichHTML(`@UUID[${activity.sourceId}]`),
                             players: {
                                 [partyMember.name]: {
-                                    name: partyMember.name,
-                                    id: partyMember.id,
+                                    actor: partyMember,
                                     color: getUserColor(partyMember)
                                 }
                             }
@@ -140,20 +134,11 @@ async function getExplorationData(){
     }
 
     // Turn activities into Array for sorting then back into object
-    supportedActivities = Object.fromEntries(Object.entries(supportedActivities).sort((a, b) => {
-        if(a[1].name < b[1].name) { return -1; }
-        if(a[1].name > b[1].name) { return 1; }
+    activities = Object.fromEntries(Object.entries(activities).sort((a, b) => {
+        if(a[1].activity.name < b[1].activity.name) { return -1; }
+        if(a[1].activity.name > b[1].activity.name) { return 1; }
         return 0;
     }));
-
-    // Turn activities into Array for sorting then back into object
-    otherActivities = Object.fromEntries(Object.entries(otherActivities).sort((a, b) => {
-        if(a[1].name < b[1].name) { return -1; }
-        if(a[1].name > b[1].name) { return 1; }
-        return 0;
-    }));
-
-    const activities = {supportedActivities, otherActivities}
     console.log(activities);
 
     return activities;
@@ -165,24 +150,10 @@ function getUserColor(actor){
     return color;
 }
 
-function getRollColor(dieRoll){
-    let color;
-    if (dieRoll.total === 1) {
-        color = `color:red;`;
-    }
-    else if (dieRoll.total === 20) {
-        color = `color:green;`;
-    }
-    else {
-        color = `color:#87cefa;`;
-    }
-    return color;
-}
-
-async function getRollResult(actor, skill, actionName, actionSlug, subordinateActionSlug){
+async function getRollResult(actor, skill, activityName, subordinateActionSlug){
     const domains = ['all', 'check', 'skill-check', `${skill.slug}`, `${skill.slug}-check`, `${skill.attribute}-based`, `${skill.attribute}-skill-check`]
-    
-    const actionPredicates = [`action:${actionSlug}`];
+
+    const actionPredicates = [`action:${activityName.slugify()}`];
     if(subordinateActionSlug) actionPredicates.push(`action:${subordinateActionSlug}`);
     
     const options = actor.getRollOptions(domains);
@@ -190,7 +161,7 @@ async function getRollResult(actor, skill, actionName, actionSlug, subordinateAc
     actionPredicates.forEach((p) => {options.push(p)});
 
 
-    const checkModifiers = new game.pf2e.CheckModifier(`${actionName} (${skill.label})`, skill);
+    const checkModifiers = new game.pf2e.CheckModifier(`${activityName} (${skill.label})`, skill);
     const rollData = await game.pf2e.Check.roll(
         checkModifiers, 
         {
@@ -208,14 +179,26 @@ async function getRollResult(actor, skill, actionName, actionSlug, subordinateAc
     const {enabledModifiers, remainingModifiers} = getEnabledRollModifiers(checkModifiers);
     const potentialModifiers = getPotentialRollModifiers(remainingModifiers, actionPredicates);
     return {
-        rollData: {
-            total: rollData.total,
-            result: rollData.result,
-            color: color
-        },
-        enabledModifiers : enabledModifiers,
-        potentialModifiers : potentialModifiers,
+        rollValue: rollData.dice[0].total,
+        totalModifier: rollData.options.totalModifier,
+        color: color,
+        enabledModifiers: enabledModifiers,
+        potentialModifiers: potentialModifiers,
     };
+}
+
+function getRollColor(dieRoll){
+    let color;
+    if (dieRoll.total === 1) {
+        color = `color:red;`;
+    }
+    else if (dieRoll.total === 20) {
+        color = `color:green;`;
+    }
+    else {
+        color = `color:#87cefa;`;
+    }
+    return color;
 }
 
 function getEnabledRollModifiers(checkModifiers){
@@ -226,9 +209,14 @@ function getEnabledRollModifiers(checkModifiers){
         m.enabled ? enabledModifiers.push(m) : remainingModifiers.push(m)
     });
     
-    return {enabledModifiers: enabledModifiers, remainingModifiers: remainingModifiers};
+    return {
+        enabledModifiers: enabledModifiers, 
+        remainingModifiers: remainingModifiers
+    };
 }
 
+
+//TODO: Figure out Pursue a Lead and other potential modifiers that have a wider selections
 // Check's Modifier's predicates to see if any match the predicateToSearch
 function getPotentialRollModifiers(checkModifiers, predicatesToSearch){  
     const potentialModifiers = checkModifiers?.
@@ -283,6 +271,7 @@ function htmlClosest(child, selectors) {
 export {
     getPartyMembers,
     getExplorationData,
+    getRollColor,
     applyEffect,
     htmlClosest
 }

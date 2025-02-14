@@ -47,6 +47,10 @@
     margin: 0.25rem 0;
 }
 
+.pf2e-eat .roll-text {
+    font-size: var(--font-size-16);
+}
+
 .pf2e-eat .exploration-table .content-link {
     color: var(--color-text-dark-primary);
     background: #DDD;

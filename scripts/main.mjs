@@ -9,11 +9,14 @@ Hooks.once("init", () => {
     }
 
     const handlebarHelpers = {
-        "eat-obj-length": (value, options) => {
+        "eatObjLength": (value) => {
             return Object.keys(value).length;
         },
-        "isPositive": (value, options) =>{
+        "isPositive": (value) =>{
             return value >= 0 ? "+" : "";
+        },
+        "add": (a, b) => {
+            return a + b;
         }
     }
     Handlebars.registerHelper(handlebarHelpers);
