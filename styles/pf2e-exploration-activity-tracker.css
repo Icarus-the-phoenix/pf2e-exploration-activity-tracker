@@ -51,6 +51,14 @@
     font-size: var(--font-size-16);
 }
 
+.pf2e-eat .roll-text span {
+    text-shadow: 
+        -1px -1px 0 var(--color-cool-5-50),
+        1px -1px 0 var(--color-cool-5-50),
+        -1px 1px 0 var(--color-cool-5-50),
+        1px 1px 0 var(--color-cool-5-50);
+}
+
 .pf2e-eat .exploration-table .content-link {
     color: var(--color-text-dark-primary);
     background: #DDD;

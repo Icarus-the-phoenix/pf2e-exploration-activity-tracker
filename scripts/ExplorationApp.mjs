@@ -17,6 +17,7 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
             height: 800
         },
         actions: {
+            applyFollowTheExpert: this.prototype.applyFollowTheExpert,
             applyRaiseAShield: this.prototype.applyRaiseAShield,
             applyScout: this.prototype.applyScout,
             removeEffect: this.prototype.removeEffect,
@@ -56,8 +57,13 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         }
     }
 
+    applyFollowTheExpert(evt, target){
+        console.log(target);
+        applyEffect(game.actors.get(target.dataset.actorId), "Compendium.pf2e.other-effects.Item.VCSpuc3Tf3XWMkd3");
+    }
+
     applyRaiseAShield(evt, target) {
-        applyEffect(game.actors.get(target.getAttribute("actorId")), "Compendium.pf2e.equipment-effects.Item.2YgXoHvJfrDHucMr");
+        applyEffect(game.actors.get(target.dataset.actorId), "Compendium.pf2e.equipment-effects.Item.2YgXoHvJfrDHucMr");
     }
 
     applyScout(){

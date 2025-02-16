@@ -88,7 +88,7 @@
 
                 {{! If a button property exists creat HTML for Button}}
                 {{else if button}}
-                    <th><button data-action="{{button.dataAction}}" actorid="{{button.actorId}}">{{button.label}}</button></th>
+                    <th><button data-action="{{button.dataAction}}" data-actor-id="{{actor.id}}">{{button.label}}</button></th>
 
                 {{! If neither button or roll exist display a user tip or leave blank}}
                 {{else}}

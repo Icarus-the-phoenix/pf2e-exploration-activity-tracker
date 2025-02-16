@@ -60,13 +60,15 @@ async function getExplorationData(){
                         // TODO: IDEA is to have defend hook onto combat creation and apply effect with duration lasting until player's turn
                         activities[activity.name].players[partyMember.name].button = {
                             label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
-                            actorId: partyMember.id,
                             dataAction: "applyRaiseAShield"
                         }
                     break;
                     // Follow the Expert
                     case SUPPORTED_ACTIVITIES.FOLLOW_THE_EXPERT_ID:
-                        
+                        activities[activity.name].players[partyMember.name].button = {
+                            label: game.i18n.localize("PF2e-EAT.toggle-effect-button"),
+                            dataAction: "applyFollowTheExpert"
+                        }
                     break;
                     // Gather Information
                     case SUPPORTED_ACTIVITIES.GATHER_INFORMATION_ID:
