@@ -1,5 +1,5 @@
 /* change classs to .application.pf2e-eat */
-
+/*
 .exploration-button {
     background: transparent;
     padding: 6px 4px 2px 4px;
@@ -67,3 +67,12 @@
 .pf2e-eat .exploration-table .tags .tag.tag_transparent{
     background-color: var(--blind-roll);
 }
+
+.pf2e-eat.follow-the-expert.settings {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px;
+    align-items: center;
+    justify-items: center;
+}
+*/

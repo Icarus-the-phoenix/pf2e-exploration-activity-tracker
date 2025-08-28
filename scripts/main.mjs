@@ -1,5 +1,7 @@
 import { PF2eEATConstants } from "./constants.mjs";
-import { ExplorationApp } from "./ExplorationApp.mjs"
+import { ExplorationApp } from "./ExplorationApp.mjs";
+import { FollowTheExpertApp } from "./FollowTheExpertApp.mjs";
+
 
 Hooks.once("init", () => {
     const module = game.modules.get(PF2eEATConstants.MODULE_ID);
@@ -24,18 +26,24 @@ Hooks.once("init", () => {
     console.log(`PF2e Exploration Activity Tracker | Ready`)
 });
 
-Hooks.on("renderPlayerList", (playerlist, [html]) => {
+Hooks.on("renderPlayers", (players, html) => {
     if(game.user.isGM){
-            const buttonHtml = `
-            <button class="exploration-button">
+        const buttonHtml = 
+            `<button class="exploration-button">
                 <i class="window-icon fa-fw fa-solid fa-trees"></i>
                 Exploration
-            </button>
-        `
-        html.insertAdjacentHTML("beforeend",`${buttonHtml}`);
+            </button>`;
+        
+        html.querySelector("#players-active").insertAdjacentHTML("beforeend",`${buttonHtml}`);
         
         html.querySelector('.exploration-button').addEventListener('click', ev => {
             new ExplorationApp().render({force:true});
+            //new FollowTheExpertApp().render({force:true});
         })
     }
 });
+
+
+//TODO: figure out why exploration activities on character sheets are being reset when reloading. 
+//      Tested in my world without mods. Still happens. Try fresh world next
+//      Tested and is a bug. Will be fixed in future version. For now give/remove hero point to fix after each reload.

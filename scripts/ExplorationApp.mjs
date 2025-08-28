@@ -39,9 +39,8 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         }
     }
 
-    // TODO: figure out scrollable
     static PARTS = {
-        body: { template: PF2eEATConstants.TEMPLATES.EXPLORATIONAPP, scrollable: [''] }
+        body: { template: PF2eEATConstants.TEMPLATES.EXPLORATION_APP, scrollable: [''] }
     }
 
     async _prepareContext(partId, context) {     
@@ -83,13 +82,6 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
         activities[activityName].players[actorName].roll.rollValue = roll.total;
         activities[activityName].players[actorName].roll.color = color;
-
-        /*
-        const rollHtml = target.previousElementSibling;
-        rollHtml.setAttribute("style", color);
-        rollHtml.setAttribute("data-tooltip", `${roll.total} + ${totalModifier}`);
-        rollHtml.innerHTML = `${roll.total+totalModifier}`
-        */
 
         this.activities = activities;
         this.render(true);

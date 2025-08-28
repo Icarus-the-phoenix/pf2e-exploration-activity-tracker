@@ -47,7 +47,7 @@ async function getExplorationData(){
                     }
                 }
 
-                let skill, result;             
+                let skill, result;
                 switch(activity.sourceId){
                     // Avoid Notice
                     case SUPPORTED_ACTIVITIES.AVOID_NOTICE_ID:
@@ -176,7 +176,6 @@ async function getRollResult(actor, skill, activityName, subordinateActionSlug){
             skipDialog: true
         }
     );
-    console.log(rollData);
     const color = getRollColor(rollData.dice[0]);
     const {enabledModifiers, remainingModifiers} = getEnabledRollModifiers(checkModifiers);
     const potentialModifiers = getPotentialRollModifiers(remainingModifiers, actionPredicates);
@@ -217,13 +216,15 @@ function getEnabledRollModifiers(checkModifiers){
     };
 }
 
-
-//TODO: Figure out Pursue a Lead and other potential modifiers that have a wider selections
 // Check's Modifier's predicates to see if any match the predicateToSearch
 function getPotentialRollModifiers(checkModifiers, predicatesToSearch){  
+    //hardcoded predicates to search for (potentially change this to check toggleable roll-options)
+    const hardCodedPotentialPredicates = ["pursue-a-lead"];
+    hardCodedPotentialPredicates.forEach((p) => predicatesToSearch.push(p));
     const potentialModifiers = checkModifiers?.
         filter((m) => m.type !== "proficiency").                            // Filter out proficiency modifiers
-        filter((m) => isStringInObject(m.predicate, predicatesToSearch));   // Checks for predicates matching
+        filter((m) => isStringInObject(m.predicate, predicatesToSearch)     // Checks for predicates matching
+    );   
 
     return potentialModifiers;
 }
