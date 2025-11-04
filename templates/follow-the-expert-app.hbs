@@ -1,0 +1,21 @@
+<div class="pf2e-eat follow-the-expert settings">
+    <label>Party Member</label>
+    <select name="party-member">
+    {{#each this}}
+        <option value={{id}} {{#if selected}}selected{{/if}}>{{name}}</option>
+    {{/each}}
+        {{!selectOptions this valueAttr="id" labelAttr="name"}}
+    </select>
+    <label>Skill</label>
+    <div id="skillSelection">
+    {{#each this}}
+        <div id={{id}} {{#unless selected}}hidden{{/unless}}>
+            {{#each skills}}
+                <label class="checkbox">
+                    <input type="radio" name={{../id}} value={{rank}}>{{label}}
+                </label>
+            {{/each}}
+        </div>
+    {{/each}}
+    </div>
+</div>

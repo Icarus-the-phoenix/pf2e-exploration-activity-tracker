@@ -1,0 +1,130 @@
+<div class="pf2e-eat scrollable">
+    <table class="exploration-table">
+
+        {{! --------------- Suported Activities ------------------}}
+        <tr>
+            <th colspan="3">Supported Activities</th>
+        </tr>
+        <tr>
+            <th>Activity</th>
+            <th>Name</th>
+            <th>Misc</th>
+        </tr>
+
+        {{! Create HTML for each activity, each player using them, and misc data like roll results and buttons}}
+        {{#each activities}}
+        {{#if supported}}
+        <tr>
+            
+            {{! Create HTML for activity column and make is span a number of rows to match how many players are using it}}
+            <th rowspan="{{eatObjLength players}}">
+                {{{enrichedHTML}}}
+            </th>
+
+            {{! Create HTML for player's name and misc table columns}}
+            {{#each players}}
+                {{! Player's name with color of user}}
+                <th class="player-name"><strong style="color: {{color}};">{{actor.name}}</strong></th>
+                
+                {{! If a roll property exists create HTML for the roll}}
+                {{#if roll}}
+                    <th>
+                        
+                        {{! Add Roll result}} 
+                        <div class="roll-text">
+                            <span style="{{roll.color}}" data-tooltip="{{roll.rollValue}} + {{roll.totalModifier}}">{{add roll.rollValue roll.totalModifier}}</span>
+                            <a data-action="reroll" data-activity-name="{{../activity.name}}" data-actor-name="{{actor.name}}" data-total-modifier="{{roll.totalModifier}}">
+                                    <i class="fa-solid fa-rotate rotate clickable-icon"></i>
+                            </a>
+                        </div>
+
+                        {{! Add modifier boxes for enabled modifiers }}
+                        <div class="tags modifiers" style="justify-content:center;">
+                        {{#each roll.enabledModifiers}}
+                        
+                            {{! Make tag clickable if parent exists }}
+                            {{#if rule.parent.id}}<a>{{/if}}
+
+                            <span class="tag tag_transparent" 
+                                data-slug="{{slug}}"
+                                {{! If parent item exists create link data needed to open it }}
+                                {{#if rule.parent.id}}
+                                data-tooltip="Open [{{rule.parent.name}}]"
+                                data-action="openItemSheet"
+                                data-item-id="{{rule.parent.id}}"
+                                data-player-id="{{../actor.id}}"
+                                {{/if}}>{{label}} {{isPositive modifier}}{{modifier}}</span>
+
+                            {{#if rule.parent.id}}</a>{{/if}}
+                            
+                        {{/each}}
+                        </div>
+
+                        {{#if roll.potentialModifiers}}
+                        <hr>
+                        <span>Potential Modifiers</span>
+
+                        {{! Add modifier boxes for potential modifiers}}
+                        <div class="tags modifiers" style="justify-content:center;">
+                        {{#each roll.potentialModifiers}}
+
+                            {{! Make tag clickable if parent exists }}
+                            {{#if rule.parent.id}}<a>{{/if}}
+                                
+                            <span class="tag tag_transparent" 
+                                data-slug="{{slug}}" 
+                                {{#if rule.parent.id}}
+                                data-tooltip="Open [{{rule.parent.name}}]"
+                                data-action="openItemSheet" 
+                                data-item-id="{{rule.parent.id}}" 
+                                data-player-id="{{../actor.id}}"
+                                {{/if}}>{{label}} {{isPositive modifier}}{{modifier}}</span>
+
+                            {{#if rule.parent.id}}</a>{{/if}}
+                        {{/each}}
+                        {{/if}}
+                        </div>
+                    </th>
+
+                {{! If a button property exists creat HTML for Button}}
+                {{else if button}}
+                    <th><button data-action="{{button.dataAction}}" data-actor-id="{{actor.id}}">{{button.label}}</button></th>
+
+                {{! If neither button or roll exist display a user tip or leave blank}}
+                {{else}}
+                    <td>tip</td>
+                {{/if}}
+                </tr>
+            {{/each}}
+        </tr>
+        {{/if}}
+        {{/each}}
+    </table>
+
+
+    {{! --------------  Other Activities  -----------------}}
+    <table class="exploration-table">
+        <tr>
+            <th colspan="2">Other Activities</th>
+        </tr>
+        <tr>
+            <th>Activity</th>
+            <th>Name</th>
+        </tr>
+        {{#each activities}}
+        {{#if unsupported}}
+        <tr>
+            {{! Create HTML for activity column and make is span a number of rows to match how many players are using it}}
+            <th rowspan="{{eatObjLength players}}">
+                {{{enrichedHTML}}}
+            </th>
+            {{! Create HTML for player's name and misc table columns}}
+            {{#each players}}
+                {{! Player's name with color of user}}
+                <th class="player-name"><strong style="color: {{color}};">{{actor.name}}</strong></th>
+            {{/each}}
+        </tr>       
+        {{/if}}
+        {{/each}}   
+    </table>
+</div>
