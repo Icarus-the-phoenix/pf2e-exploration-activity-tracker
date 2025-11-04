@@ -1,4 +1,51 @@
 <div class="pf2e-eat scrollable">
+
+
+    <section>
+        <header class="content-header">
+            <a>Supported Activities</a>
+            <div class="buttons">
+                <button>Reroll Activities</button>
+                <button>Apply All Effects</button>
+                <button>Reset Activities</button>
+            </div>
+        </header>
+        <div class="activities flex-column">
+            <section class="activity-block">
+                <div class="activity-entry flex-row">
+                    <section class="activity flex-column">                                                  {{! Add Data Action to open sheet}}
+                        <span class="name">ActivityNamePlaceholder</span>
+                        <span class="tags">
+                            <span class="tag tag_transparent">TagNamePlaceholder</span>         {{! Add tooltip to for tag}}
+                        </span>
+                    </section>
+                    <section class="actors flex-column">
+                        <section class="actor-block flex-row">                                                 
+                            <div class="actor-info flex-column">                                                 {{! Make clicking actor section open actor sheet}}
+                                <img src="systems/pf2e/icons/iconics/AmiriFull.webp">
+                                <span class="name">ActorNamePlaceholder</span>
+                            </div>
+                            <section class="activity-outcome-block flex-column">
+                                <span class="roll-outcome">Outcome: 20</span>
+                                <span class="tags">
+                                    <span class="tag tag_transparent">TagNamePlaceholder</span>         {{! Add tooltip to for tag}}
+                                    <span class="tag tag_transparent">TagNamePlaceholder</span>                                   
+                                </span>
+                                <span>Potential Modifiers</span>
+                                <span class="tags">
+                                    <span class="tag tag_transparent">TagNamePlaceholder</span>         {{! Add tooltip to for tag}}
+                                    <span class="tag tag_transparent">TagNamePlaceholder</span>                                   
+                                </span>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+            </section>
+        </div>
+    </section>
+
+
+
     <table class="exploration-table">
 
         {{! --------------- Suported Activities ------------------}}

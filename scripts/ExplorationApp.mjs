@@ -5,16 +5,15 @@ import { getExplorationData, applyEffect, getPartyMembers, htmlClosest, getRollC
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
     static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
-        id: "explortion-activity-tracker-app",
+        id: "exploration-activity-tracker-app",
         window:{
             title:"Exploration Activity Tracker",
-            icon:"fa-solid fa-trees"
+            icon:"fa-solid fa-trees",
+            resizable: true
         },
         position: {
             top: 100,
-            left: 100,
-            width: 600,
-            height: 800
+            left: 100
         },
         actions: {
             applyFollowTheExpert: this.prototype.applyFollowTheExpert,
@@ -40,6 +39,7 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     static PARTS = {
+        //TODO: Restructure to look like Party Sheet's Exploration Tab 
         body: { template: PF2eEATConstants.TEMPLATES.EXPLORATION_APP, scrollable: [''] }
     }
 

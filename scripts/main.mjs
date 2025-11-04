@@ -42,8 +42,3 @@ Hooks.on("renderPlayers", (players, html) => {
         })
     }
 });
-
-
-//TODO: figure out why exploration activities on character sheets are being reset when reloading. 
-//      Tested in my world without mods. Still happens. Try fresh world next
-//      Tested and is a bug. Will be fixed in future version. For now give/remove hero point to fix after each reload.
