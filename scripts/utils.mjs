@@ -172,7 +172,7 @@ async function getRollResult(actor, skill, activityName, subordinateActionSlug){
             traits: ['exploration'],
             options,
             domains,
-            createMessage: true,
+            createMessage: false,
             skipDialog: true
         }
     );

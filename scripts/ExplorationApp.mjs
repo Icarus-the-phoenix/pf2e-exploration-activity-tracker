@@ -69,7 +69,6 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         applyEffect(getPartyMembers(), "Compendium.pf2e.other-effects.Item.EMqGwUi3VMhCjTlF");
     }
 
-    // TODO: Store Data needed for roll in activities and reroll.
     async reroll(evt, target){
         const activities = this.activities;
 

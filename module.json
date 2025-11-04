@@ -1,10 +1,10 @@
 {
   "id": "pf2e-exploration-activity-tracker",
-  "title": "Pf2e Exploration Activity Tracker",
+  "title": "Pf2e EAT (Exploration Activity Tracker)",
   "version": "1.0.0",
   "compatibility": {
-    "minimum": "12",
-    "verified": "12"
+    "minimum": "13",
+    "verified": "13"
   },
   "esmodules": [
     "scripts/main.mjs"
