@@ -35,6 +35,10 @@ async function getExplorationData(){
                     activities = {...activities,
                         [activity.name]:{
                             activity: activity,
+                            traits: activity.traits.map((trait) => ({ 
+                                name: trait,
+                                tooltip: CONFIG.PF2E.traitsDescriptions[trait]
+                            })),
                             supported: true,
                             enrichedHTML: await TextEditor.enrichHTML(`@UUID[${activity.sourceId}]`),
                             players: {
@@ -120,6 +124,10 @@ async function getExplorationData(){
                     activities = {...activities,
                         [activity.name]:{
                             activity: activity,
+                            traits: activity.traits.map((trait) => ({ 
+                                name: trait,
+                                tooltip: CONFIG.PF2E.traitsDescriptions[trait]
+                            })),
                             unsupported: true,
                             enrichedHTML: await TextEditor.enrichHTML(`@UUID[${activity.sourceId}]`),
                             players: {

@@ -19,7 +19,10 @@ Hooks.once("init", () => {
         },
         "add": (a, b) => {
             return a + b;
-        }
+        },
+        "capitalizeFirst": (value) => {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+        },
     }
     Handlebars.registerHelper(handlebarHelpers);
 

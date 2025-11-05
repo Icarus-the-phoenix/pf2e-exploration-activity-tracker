@@ -1,5 +1,9 @@
 /* change classs to .application.pf2e-eat */
 
+#exploration-activity-tracker-app {
+    min-width: 560px;
+}
+
 #exploration-activity-tracker-app .window-content {
     background: url("/systems/pf2e/assets/sheet/background.webp") repeat;
     font-size: var(--font-size-16);
@@ -33,6 +37,10 @@
     line-height: 2.375rem;
 }
 
+#exploration-activity-tracker-app header.content-header:not(:first-of-type) {
+    margin: 0.5rem 0rem;
+}
+
 #exploration-activity-tracker-app header.content-header .buttons{
     align-items: center;
     display: flex;
@@ -52,15 +60,11 @@
 
 #exploration-activity-tracker-app .activities .activity-block .activity-entry {
     flex-grow: 1;
-    overflow: hidden;
-}
-
-#exploration-activity-tracker-app .activities .activity-block .activity-entry .name {
-    overflow: hidden;
 }
 
 #exploration-activity-tracker-app .activities .activity-block .activity-entry .activity {
-    flex-shrink: 0;
+    width: 35%;
+    gap: 0.125rem
 }
 
 #exploration-activity-tracker-app .activities .actors {
@@ -92,14 +96,32 @@
 }
 
 #exploration-activity-tracker-app .activities .activity-block .activity-entry .activity-outcome-block {
+    width: 50%;
     flex-shrink: 0;
     flex-grow: 1;
+    row-gap: 0.125rem;
     align-items: center;
 }
 
+#exploration-activity-tracker-app .activities .activity-block .activity-entry .activity-outcome-block .roll-container {
+    gap: 0.125rem;
+}
 
+#exploration-activity-tracker-app .activities .activity-block .activity-entry .activity-outcome-block .d20 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("../../../icons/svg/d20-grey.svg");
+    width: 30px;
+    height: 30px;
+    background-size: 30px 30px;
+    padding-right: 2px;
+    font-weight: bold;
+}
 
-
+#exploration-activity-tracker-app .activities .activity-block .activity-entry .activity-outcome-block .potential-modifiers {
+    font-size: var(--font-size-14);
+}
 
 /*
 .exploration-button {

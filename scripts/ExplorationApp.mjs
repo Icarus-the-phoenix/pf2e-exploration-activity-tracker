@@ -22,6 +22,7 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
             removeEffect: this.prototype.removeEffect,
             reroll: this.prototype.reroll,
             recallKnowledgeMacro: this.prototype.recallKnowledgeMacro,
+            openActorSheet: this.prototype.openActorSheet,
             openItemSheet: this.prototype.openItemSheet
         }
     }, {inplace: false});
@@ -39,7 +40,6 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     static PARTS = {
-        //TODO: Restructure to look like Party Sheet's Exploration Tab 
         body: { template: PF2eEATConstants.TEMPLATES.EXPLORATION_APP, scrollable: [''] }
     }
 
@@ -54,6 +54,23 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         return {
             activities
         }
+    }
+
+    _onRender(context, options) {
+        const actorInfosForTokenHighlight = this.element.querySelectorAll('.actor-info');
+        for(const actorInfo of actorInfosForTokenHighlight){
+            this.highlightTokenOnHoverElement(actorInfo);
+        }
+    }
+
+    highlightTokenOnHoverElement(element){
+        const token = canvas.tokens.placeables.find(x => x.actor.id === element.dataset.actorId);
+        element.addEventListener("mouseover", (event) => {
+            token._onHoverIn(event);
+        });
+        element.addEventListener("mouseout", (event) => {
+            token._onHoverOut(event);
+        });
     }
 
     applyFollowTheExpert(evt, target){
@@ -86,11 +103,19 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         this.render(true);
     }
 
-    openItemSheet(evt, target){
-        const htmlDOM = htmlClosest(target, "[data-item-id]");
-        const itemId = htmlDOM?.dataset.itemId;
-        const playerId = htmlDOM?.dataset.playerId;
-        const item = game.actors.get(playerId).items.get(itemId);
+    openActorSheet(evt, target){
+        const htmlDOM = htmlClosest(target, "[data-actor-id]");
+        const actorId = htmlDOM?.dataset.actorId;
+        const tab = htmlDOM?.dataset.tab;
+        const actor = game.actors.get(actorId);
+        actor.sheet.rendered ? actor.sheet.close() : actor.sheet.render(true, { tab });
+    }
+
+    async openItemSheet(evt, target){
+        const htmlDOM = htmlClosest(target, "[data-item-uuid]");
+        const itemUuid = htmlDOM?.dataset.itemUuid;
+        const item = await fromUuid(itemUuid);
+        console.log(item);
         item.sheet.rendered ? item.sheet.close() : item.sheet.render(true);
     }
 }
