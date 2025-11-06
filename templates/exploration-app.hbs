@@ -1,110 +1,124 @@
 <div class="pf2e-eat scrollable" data-tooltip-class="pf2e">
 
-
     <section>
+
+        {{!-- Header For Supported Activities --}}
         <header class="content-header">
             <a>Supported Activities</a>
             <div class="buttons">
                 <button>Reroll Activities</button>
                 <button>Apply All Effects</button>
-                <button>Reset Activities</button>
             </div>
         </header>
+        
+        {{!-- Supported Activities --}}
         <div class="activities flex-column">
             {{#each activities}}
             {{#if supported}}
-            <section class="activity-block">
-                <div class="activity-entry flex-row">
-                    <section class="activity flex-column">
-                        <a class="name" data-action="openItemSheet" data-item-uuid="{{activity.uuid}}">{{activity.name}}</a>
-                        <span class="tags">
-                            {{#each traits}}
-                                <span class="tag" data-tooltip="{{tooltip}}">{{name}}</span>
-                            {{/each}}
-                        </span>
-                    </section>
-                    <section class="actors flex-column">
-                        {{#each players}}
-                        <section class="actor-block flex-row">                                                 
-                            <a class="actor-info flex-column" data-action="openActorSheet" data-actor-id={{actor.id}} data-tab="exploration">
-                                <img src={{actor.img}}>
-                                <span class="name">{{actor.name}}</span>
-                            </a>
+            {{!-- For Each Supported Activity --}}
+            {{!-- Main container for an activity --}}
+            <section class="activity-block flex-row">
 
-                            {{#if roll}}
-                            <section class="activity-outcome-block flex-column">
-                                <div class="roll-container flex-row">
-                                    <div class="d20">
-                                        <span>{{roll.rollValue}}</span>
-                                    </div>
-                                    <span> + {{roll.totalModifier}} = {{add roll.rollValue roll.totalModifier}}</span>
-                                    <a data-action="reroll" data-activity-name="{{../activity.name}}" data-actor-name="{{actor.name}}" data-total-modifier="{{roll.totalModifier}}">
-                                        <i class="fa-solid fa-rotate rotate clickable-icon"></i>
-                                    </a>
-                                </div>
-                                <span class="tags">
-                                    {{#each roll.enabledModifiers}}
-
-                                        {{! Make tag clickable if parent exists }}
-                                        {{#if rule.parent.id}}
-                                            <a>
-                                        {{/if}}
-
-                                        <span class="tag tag_transparent" 
-                                            data-slug="{{slug}}"
-                                            {{! If parent item exists create link data needed to open it }}
-                                            {{#if rule.parent.id}}
-                                            data-tooltip="Open [{{rule.parent.name}}]" data-action="openItemSheet" data-item-uuid="{{rule.parent.uuid}}"
-                                            {{/if}}>
-                                            {{label}}{{isPositive modifier}}{{modifier}}
-                                        </span>
-
-                                        {{#if rule.parent.id}}
-                                            </a>
-                                        {{/if}}
-
-                                    {{/each}}                               
-                                </span>
-
-                                {{#if roll.potentialModifiers}}
-                                <span class="potential-modifiers">Potential Modifiers</span>
-                                <span class="tags">
-                                    {{#each roll.potentialModifiers}}
-
-                                        {{! Make tag clickable if parent exists }}
-                                        {{#if rule.parent.id}}
-                                            <a>
-                                        {{/if}}
-                                            
-                                        <span class="tag tag_transparent" 
-                                            data-slug="{{slug}}" 
-                                            {{#if rule.parent.id}}
-                                            data-tooltip="Open [{{rule.parent.name}}]" data-action="openItemSheet" data-item-uuid="{{rule.parent.uuid}}"
-                                            {{/if}}>
-                                            {{label}} {{isPositive modifier}}{{modifier}}
-                                        </span>
-
-                                        {{#if rule.parent.id}}
-                                            </a>
-                                        {{/if}}
-                                        
-                                    {{/each}}                                
-                                </span>
-                                {{/if}}
-
-                            </section>
-
-                            {{else if button}}
-                            <section class="activity-outcome-block flex-column">
-                                <button data-action="{{button.dataAction}}" data-actor-id="{{actor.id}}">{{button.label}}</button>
-                            </section>
-
-                            {{/if}}
-
-                        </section>
+                {{!-- Contains an Activity's Name, Link to Sheet, and Traits --}}
+                <section class="activity flex-column">
+                    <a class="name" data-action="openItemSheet" data-item-uuid="{{activity.uuid}}">{{activity.name}}</a>
+                    <span class="tags">
+                        {{#each traits}}
+                            <span class="tag" data-tooltip="{{tooltip}}">{{name}}</span>
                         {{/each}}
+                    </span>
+                </section>
+
+                {{!-- Contains all Actors using the Activity --}}
+                <section class="actors flex-column">
+                    {{#each players}}
+                    {{!-- Contains single Actor's information related to the Activity --}}
+                    <section class="actor-block flex-row">          
+
+                        {{!-- Actor's Image and Name with link to Sheet --}}
+                        <a class="actor-info flex-column" data-action="openActorSheet" data-actor-id={{actor.id}} data-tab="exploration">
+                            <img src={{actor.img}}>
+                            <span class="name">{{actor.name}}</span>
+                        </a>
+
+                        {{#if roll}}
+                        {{!-- Contains information related to Activities that need Rolls --}}
+                        <section class="activity-outcome-block flex-column">
+                            
+                            {{!-- Shows Roll outcome and Reroll button --}}
+                            <div class="roll-container flex-row">
+                                <div class="d20">
+                                    <span>{{roll.rollValue}}</span>
+                                </div>
+                                <span> + {{roll.totalModifier}} = {{add roll.rollValue roll.totalModifier}}</span>
+                                <a data-action="reroll" data-activity-name="{{../activity.name}}" data-actor-name="{{actor.name}}" data-total-modifier="{{roll.totalModifier}}">
+                                    <i class="fa-solid fa-rotate rotate clickable-icon"></i>
+                                </a>
+                            </div>
+
+                            {{!-- Shows modifiers that affected the roll --}}
+                            <span class="tags">
+                                {{#each roll.enabledModifiers}}
+
+                                    {{! Make tag clickable if parent exists }}
+                                    {{#if rule.parent.id}}
+                                        <a>
+                                    {{/if}}
+
+                                    <span class="tag tag_transparent" 
+                                        data-slug="{{slug}}"
+                                        {{! If parent item exists create link data needed to open it }}
+                                        {{#if rule.parent.id}}
+                                        data-tooltip="Open [{{rule.parent.name}}]" data-action="openItemSheet" data-item-uuid="{{rule.parent.uuid}}"
+                                        {{/if}}>
+                                        {{label}}{{isPositive modifier}}{{modifier}}
+                                    </span>
+
+                                    {{#if rule.parent.id}}
+                                        </a>
+                                    {{/if}}
+
+                                {{/each}}                               
+                            </span>
+
+                            {{#if roll.potentialModifiers}}
+                            {{!-- If there are potential modifiers, show them as well --}}
+                            <span class="potential-modifiers">Potential Modifiers</span>
+                            <span class="tags">
+                                {{#each roll.potentialModifiers}}
+
+                                    {{! Make tag clickable if parent exists }}
+                                    {{#if rule.parent.id}}
+                                        <a>
+                                    {{/if}}
+                                        
+                                    <span class="tag tag_transparent" 
+                                        data-slug="{{slug}}" 
+                                        {{#if rule.parent.id}}
+                                        data-tooltip="Open [{{rule.parent.name}}]" data-action="openItemSheet" data-item-uuid="{{rule.parent.uuid}}"
+                                        {{/if}}>
+                                        {{label}} {{isPositive modifier}}{{modifier}}
+                                    </span>
+
+                                    {{#if rule.parent.id}}
+                                        </a>
+                                    {{/if}}
+                                    
+                                {{/each}}                                
+                            </span>
+                            {{/if}}
+                        </section>
+
+                        {{else if button}}
+                        {{!-- If Activity requires a button, add button instead of roll information --}}
+                        <section class="activity-outcome-block flex-column">
+                            <button data-action="{{button.dataAction}}" data-actor-id="{{actor.id}}">{{button.label}}</button>
+                        </section>
+                        {{/if}}
+
                     </section>
-                </div>
+                    {{/each}}
+                </section>
             </section>
             {{/if}}
             {{/each}}
@@ -115,27 +129,25 @@
         <div class="activities flex-column">
             {{#each activities}}
             {{#if unsupported}}
-            <section class="activity-block">
-                <div class="activity-entry flex-row">
-                    <section class="activity flex-column">                   
-                        <a class="name" data-action="openItemSheet" data-item-uuid="{{activity.uuid}}">{{activity.name}}</a>
-                        <span class="tags">
-                            {{#each traits}}
-                                <span class="tag" data-tooltip="{{tooltip}}">{{name}}</span>
-                            {{/each}}
-                        </span>                        
-                    </section>
-                    <section class="actors flex-column">
-                        {{#each players}}
-                        <section class="actor-block flex-row">                                                 
-                            <a class="actor-info flex-column" data-action="openActorSheet" data-actor-id={{actor.id}} data-tab="exploration">
-                                <img src={{actor.img}}>
-                                <span class="name">{{actor.name}}</span>
-                            </a>
-                        </section>
+            <section class="activity-block flex-row">
+                <section class="activity flex-column">                   
+                    <a class="name" data-action="openItemSheet" data-item-uuid="{{activity.uuid}}">{{activity.name}}</a>
+                    <span class="tags">
+                        {{#each traits}}
+                            <span class="tag" data-tooltip="{{tooltip}}">{{name}}</span>
                         {{/each}}
+                    </span>                        
+                </section>
+                <section class="actors flex-column">
+                    {{#each players}}
+                    <section class="actor-block flex-row">                                                 
+                        <a class="actor-info flex-column" data-action="openActorSheet" data-actor-id={{actor.id}} data-tab="exploration">
+                            <img src={{actor.img}}>
+                            <span class="name">{{actor.name}}</span>
+                        </a>
                     </section>
-                </div>
+                    {{/each}}
+                </section>
             </section>
             {{/if}}
             {{/each}}
@@ -168,8 +180,8 @@
 
             {{! Create HTML for player's name and misc table columns}}
             {{#each players}}
-                {{! Player's name with color of user}}
-                <th class="player-name"><strong style="color: {{color}};">{{actor.name}}</strong></th>
+                
+                <th class="player-name"><strong>{{actor.name}}</strong></th>
                 
                 {{! If a roll property exists create HTML for the roll}}
                 {{#if roll}}
@@ -177,7 +189,7 @@
                         
                         {{! Add Roll result}} 
                         <div class="roll-text">
-                            <span style="{{roll.color}}" data-tooltip="{{roll.rollValue}} + {{roll.totalModifier}}">{{add roll.rollValue roll.totalModifier}}</span>
+                            <span data-tooltip="{{roll.rollValue}} + {{roll.totalModifier}}">{{add roll.rollValue roll.totalModifier}}</span>
                             <a data-action="reroll" data-activity-name="{{../activity.name}}" data-actor-name="{{actor.name}}" data-total-modifier="{{roll.totalModifier}}">
                                     <i class="fa-solid fa-rotate rotate clickable-icon"></i>
                             </a>
@@ -265,8 +277,7 @@
             </th>
             {{! Create HTML for player's name and misc table columns}}
             {{#each players}}
-                {{! Player's name with color of user}}
-                <th class="player-name"><strong style="color: {{color}};">{{actor.name}}</strong></th>
+                <th class="player-name"><strong>{{actor.name}}</strong></th>
             {{/each}}
         </tr>       
         {{/if}}

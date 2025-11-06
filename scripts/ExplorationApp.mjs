@@ -1,5 +1,5 @@
 import { PF2eEATConstants } from "./constants.mjs";
-import { getExplorationData, applyEffect, getPartyMembers, htmlClosest, getRollColor } from "./utils.mjs";
+import { getExplorationData, applyEffect, getPartyMembers, htmlClosest } from "./utils.mjs";
 
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -94,10 +94,8 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         const actorName = htmlDOM?.dataset.actorName;
         const totalModifier = htmlDOM?.dataset.totalModifier;
         const roll = await new Roll("1d20").evaluate();
-        const color = getRollColor(roll);
 
         activities[activityName].players[actorName].roll.rollValue = roll.total;
-        activities[activityName].players[actorName].roll.color = color;
 
         this.activities = activities;
         this.render(true);

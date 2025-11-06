@@ -10,6 +10,7 @@ const SUPPORTED_ACTIVITIES = {
     TRACK_ID : "Compendium.pf2e.actionspf2e.Item.EA5vuSgJfiHH7plD",
 }
 
+
 function getPartyMembers(){
     return game.actors.party.members.filter((m) => m.isOfType("character"));
 }
@@ -26,8 +27,7 @@ async function getExplorationData(){
                 if(activities[activity.name]){
                     activities[activity.name].players = { ...activities[activity.name].players,
                         [partyMember.name]: {
-                            actor: partyMember,
-                            color: getUserColor(partyMember)
+                            actor: partyMember
                         }
                     };
                 }
@@ -43,8 +43,7 @@ async function getExplorationData(){
                             enrichedHTML: await TextEditor.enrichHTML(`@UUID[${activity.sourceId}]`),
                             players: {
                                 [partyMember.name]: {
-                                    actor: partyMember,
-                                    color: getUserColor(partyMember)
+                                    actor: partyMember
                                 }
                             }
                         }
@@ -88,7 +87,16 @@ async function getExplorationData(){
                     break;
                     // Investigate
                     case SUPPORTED_ACTIVITIES.INVESTIGATE_ID:
-
+                        
+                        activities[activity.name].players[partyMember.name].roll = await getRecallKnowledgeResults(partyMember);
+                        
+                        // let results = [];
+                        // RECALL_KNOWLEDGE_SKILLS.forEach( async (recallKnowledgeSkill) => {
+                        //     skill = partyMember.skills[recallKnowledgeSkill];
+                        //     result = await getRollResult(partyMember, skill, activity.name, "recall-knowledge");
+                        //     results.push(result);
+                        // });
+                        // activities[activity.name].players[partyMember.name].rolls = results;
                     break;
                     // Scout
                     case SUPPORTED_ACTIVITIES.SCOUT_ID:
@@ -115,8 +123,7 @@ async function getExplorationData(){
                 if(activities[activity.name]){
                     activities[activity.name].players = { ...activities[activity.name].players,
                         [partyMember.name]: {
-                            actor: partyMember,
-                            color: getUserColor(partyMember)
+                            actor: partyMember
                         }
                     };
                 }
@@ -132,8 +139,7 @@ async function getExplorationData(){
                             enrichedHTML: await TextEditor.enrichHTML(`@UUID[${activity.sourceId}]`),
                             players: {
                                 [partyMember.name]: {
-                                    actor: partyMember,
-                                    color: getUserColor(partyMember)
+                                    actor: partyMember
                                 }
                             }
                         }
@@ -154,10 +160,50 @@ async function getExplorationData(){
     return activities;
 }
 
-function getUserColor(actor){
-    const userId = Object.keys(actor.ownership).find(f => f !== "default" && !game.users.get(f).isGM);
-    const color = game.users.get(userId)?.color ?? "grey";
-    return color;
+async function getRecallKnowledgeResults(actor){
+    const recallKnowledgeSkills = ["arcana","crafting","medicine","nature","occultism","religion","society"];
+    const loreSkills = Object.values(actor.skills).filter((s) => s.lore).map((s) => s.slug);
+    const skills = recallKnowledgeSkills.concat(loreSkills);
+
+    const dummySkill = actor.skills.arcana;
+    const dummyCheckModifiers = new game.pf2e.CheckModifier(`Dummy Roll`, dummySkill);
+    const rollData = await game.pf2e.Check.roll(
+        dummyCheckModifiers, 
+        {
+            actor: actor,
+            type: `skill-check`,
+            traits: ['exploration'],
+            createMessage: false,
+            skipDialog: true
+        }
+    );
+    
+    let rollModifiers = [];
+    skills.forEach((s) => {
+        const skill = actor.skills[s];
+        const domains = ['all', 'check', 'skill-check', `${skill.slug}`, `${skill.slug}-check`, `${skill.attribute}-based`, `${skill.attribute}-skill-check`]
+        const actionPredicates = [`action:investigate`, `action:recall-knowledge`];
+
+        const options = actor.getRollOptions(domains);
+        options.push("secret");
+        options.concat(actionPredicates);
+
+        const checkModifiers = new game.pf2e.CheckModifier(`Investigate (${skill.label})`, skill);
+        const {enabledModifiers, remainingModifiers} = getEnabledRollModifiers(checkModifiers);
+        const potentialModifiers = getPotentialRollModifiers(remainingModifiers, actionPredicates);
+
+        rollModifiers.push({
+            skillName: skill.label,
+            totalModifier: checkModifiers.totalModifier,
+            enabledModifiers: enabledModifiers,
+            potentialModifiers: potentialModifiers
+        })
+    });
+
+    return {
+        rollValue: rollData.dice[0].total,
+        rollModifiers: rollModifiers
+    }
 }
 
 async function getRollResult(actor, skill, activityName, subordinateActionSlug){
@@ -168,8 +214,7 @@ async function getRollResult(actor, skill, activityName, subordinateActionSlug){
     
     const options = actor.getRollOptions(domains);
     options.push("secret");
-    actionPredicates.forEach((p) => {options.push(p)});
-
+    options.concat(actionPredicates);
 
     const checkModifiers = new game.pf2e.CheckModifier(`${activityName} (${skill.label})`, skill);
     const rollData = await game.pf2e.Check.roll(
@@ -184,30 +229,14 @@ async function getRollResult(actor, skill, activityName, subordinateActionSlug){
             skipDialog: true
         }
     );
-    const color = getRollColor(rollData.dice[0]);
     const {enabledModifiers, remainingModifiers} = getEnabledRollModifiers(checkModifiers);
     const potentialModifiers = getPotentialRollModifiers(remainingModifiers, actionPredicates);
     return {
         rollValue: rollData.dice[0].total,
         totalModifier: rollData.options.totalModifier,
-        color: color,
         enabledModifiers: enabledModifiers,
-        potentialModifiers: potentialModifiers,
+        potentialModifiers: potentialModifiers
     };
-}
-
-function getRollColor(dieRoll){
-    let color;
-    if (dieRoll.total === 1) {
-        color = `color:red;`;
-    }
-    else if (dieRoll.total === 20) {
-        color = `color:green;`;
-    }
-    else {
-        color = `color:#87cefa;`;
-    }
-    return color;
 }
 
 function getEnabledRollModifiers(checkModifiers){
@@ -282,7 +311,6 @@ function htmlClosest(child, selectors) {
 export {
     getPartyMembers,
     getExplorationData,
-    getRollColor,
     applyEffect,
     htmlClosest
 }
