@@ -11,9 +11,6 @@ Hooks.once("init", () => {
     }
 
     const handlebarHelpers = {
-        "eatObjLength": (value) => {
-            return Object.keys(value).length;
-        },
         "isPositive": (value) =>{
             return value >= 0 ? "+" : "";
         },
@@ -22,7 +19,7 @@ Hooks.once("init", () => {
         },
         "capitalizeFirst": (value) => {
             return value.charAt(0).toUpperCase() + value.slice(1);
-        },
+        }
     }
     Handlebars.registerHelper(handlebarHelpers);
 

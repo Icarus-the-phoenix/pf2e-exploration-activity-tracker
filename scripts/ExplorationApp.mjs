@@ -5,7 +5,7 @@ import { getExplorationData, applyEffect, getPartyMembers, htmlClosest } from ".
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
     static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
-        id: "exploration-activity-tracker-app",
+        id: "pf2e-eat",
         window:{
             title:"Exploration Activity Tracker",
             icon:"fa-solid fa-trees",
@@ -57,10 +57,25 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     _onRender(context, options) {
-        const actorInfosForTokenHighlight = this.element.querySelectorAll('.actor-info');
-        for(const actorInfo of actorInfosForTokenHighlight){
+        const collapsibleElements = this.element.querySelectorAll('.collapsible');
+        for(const collapsible of collapsibleElements){
+            this.expandCollapsibleElementOnHover(collapsible);
+        }
+
+        const actorInfoElements = this.element.querySelectorAll('.actor-info');
+        for(const actorInfo of actorInfoElements){
+            
             this.highlightTokenOnHoverElement(actorInfo);
         }
+    }
+
+    expandCollapsibleElementOnHover(element) {
+        element.addEventListener("mouseover", (event) => {
+            element.querySelector('.collapsible-content').classList.add("expanded");
+        });
+        element.addEventListener("mouseout", (event) => {
+            element.querySelector('.collapsible-content').classList.remove("expanded");
+        });
     }
 
     highlightTokenOnHoverElement(element){
@@ -117,4 +132,3 @@ export class ExplorationApp extends HandlebarsApplicationMixin(ApplicationV2) {
         item.sheet.rendered ? item.sheet.close() : item.sheet.render(true);
     }
 }
-
